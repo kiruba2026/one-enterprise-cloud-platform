@@ -9,36 +9,87 @@ class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() {
-    return _DashboardPageState();
-  }
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
   // =============================================================
-  // SELECTED SIDEBAR MENU
+  // STATE
   // =============================================================
 
   String selectedMenu = 'Dashboard';
 
-  // =============================================================
-  // SIDEBAR OPEN / CLOSE
-  // =============================================================
-
+  // Desktop / tablet sidebar
   bool sidebarOpen = true;
 
+  // Mobile sidebar
+  bool mobileSidebarOpen = false;
+
+  // Header height used on mobile.
+  // The sidebar starts BELOW the header so the hamburger button
+  // remains visible.
+  static const double mobileHeaderHeight = 72;
+
   // =============================================================
-  // SELECT MENU
+  // MENU SELECTION
   // =============================================================
 
   void selectMenu(String menu) {
     setState(() {
       selectedMenu = menu;
+      mobileSidebarOpen = false;
     });
+
+    // -------------------------------------------------------------
+    // OPTIONAL NAVIGATION
+    // -------------------------------------------------------------
+    //
+    // Dashboard itself stays on this page.
+    // Other menu pages can be connected here later through
+    // AppRoutes.
+    //
+    switch (menu) {
+      case 'Dashboard':
+        break;
+
+      default:
+        _navigateToMenu(menu);
+        break;
+    }
   }
 
   // =============================================================
-  // TOGGLE SIDEBAR
+  // MENU NAVIGATION
+  // =============================================================
+
+  void _navigateToMenu(String menu) {
+    // Keep dashboard UI stable.
+    //
+    // AppSidebar contains many menu items and sub-menu items.
+    // We only navigate when the corresponding route exists.
+    //
+    // These can be expanded later as the actual pages are built.
+
+    final Map<String, String> routes = {
+      'Employees': AppRoutes.employeeManagement,
+      'Finance': AppRoutes.generalLedger,
+      'Procurement': AppRoutes.procurement,
+      'Inventory': AppRoutes.inventory,
+      'Documents': AppRoutes.documentRepository,
+      'Reports': AppRoutes.standardReports,
+      'AI Copilot': AppRoutes.aiChatCopilot,
+      'Calendar': AppRoutes.userCalendars,
+    };
+
+    final String? route = routes[menu];
+
+    if (route != null) {
+      Navigator.pushNamed(context, route);
+    }
+  }
+
+  // =============================================================
+  // DESKTOP / TABLET SIDEBAR
   // =============================================================
 
   void toggleSidebar() {
@@ -48,7 +99,25 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // =============================================================
-  // QUICK ACCESS NAVIGATION
+  // MOBILE SIDEBAR
+  // =============================================================
+
+  void toggleMobileSidebar() {
+    setState(() {
+      mobileSidebarOpen = !mobileSidebarOpen;
+    });
+  }
+
+  void closeMobileSidebar() {
+    if (mobileSidebarOpen) {
+      setState(() {
+        mobileSidebarOpen = false;
+      });
+    }
+  }
+
+  // =============================================================
+  // QUICK ACCESS
   // =============================================================
 
   void openQuickAccess(String title) {
@@ -95,105 +164,227 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8FC),
-      body: Column(
-        children: [
-          // =====================================================
-          // HEADER
-          // =====================================================
 
-          AppHeader(onMenuPressed: toggleSidebar),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double width = constraints.maxWidth;
 
-          // =====================================================
-          // MAIN AREA
-          // =====================================================
-          Expanded(
-            child: Row(
-              children: [
-                // =================================================
-                // SIDEBAR
-                // =================================================
+          // =======================================================
+          // MOBILE
+          // =======================================================
 
-                if (sidebarOpen)
-                  AppSidebar(
-                    selectedMenu: selectedMenu,
-                    onMenuSelected: selectMenu,
-                  ),
+          if (width < 700) {
+            return _buildMobileLayout();
+          }
 
-                // =================================================
-                // DASHBOARD CONTENT
-                // =================================================
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // =================================================
-                        // PAGE TITLE
-                        // =================================================
+          // =======================================================
+          // TABLET / DESKTOP
+          // =======================================================
 
-                        const Text(
-                          'Dashboard',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF172033),
-                          ),
-                        ),
+          return _buildDesktopLayout();
+        },
+      ),
+    );
+  }
 
-                        const SizedBox(height: 6),
+  // =============================================================
+  // MOBILE LAYOUT
+  // =============================================================
 
-                        const Text(
-                          'Welcome to OneCloud Enterprise Platform',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xFF64748B),
-                          ),
-                        ),
+  Widget _buildMobileLayout() {
+    return Stack(
+      children: [
+        // =========================================================
+        // MAIN MOBILE CONTENT
+        // =========================================================
 
-                        const SizedBox(height: 24),
+        Column(
+          children: [
+            // -----------------------------------------------------
+            // HEADER
+            // -----------------------------------------------------
 
-                        // =================================================
-                        // KPI CARDS
-                        // =================================================
-                        _buildKpiSection(),
+            SizedBox(
+              height: mobileHeaderHeight,
+              child: AppHeader(onMenuPressed: toggleMobileSidebar),
+            ),
 
-                        const SizedBox(height: 24),
+            // -----------------------------------------------------
+            // DASHBOARD
+            // -----------------------------------------------------
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: _buildDashboardContent(),
+              ),
+            ),
+          ],
+        ),
 
-                        // =================================================
-                        // SALES PIPELINE + PENDING APPROVALS
-                        // =================================================
-                        _buildSalesAndApprovalsSection(),
-
-                        const SizedBox(height: 24),
-
-                        // =================================================
-                        // QUICK ACCESS
-                        // =================================================
-                        _buildQuickAccessCard(),
-
-                        const SizedBox(height: 24),
-
-                        // =================================================
-                        // AI RECOMMENDATIONS
-                        // =================================================
-                        _buildAiRecommendationCard(),
-
-                        const SizedBox(height: 30),
-
-                        // =================================================
-                        // FOOTER
-                        // =================================================
-                        const AppFooter(),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+        // =========================================================
+        // DARK OVERLAY
+        // =========================================================
+        //
+        // IMPORTANT:
+        // The overlay starts BELOW the header.
+        //
+        // Therefore the hamburger button remains visible and
+        // clickable.
+        // =========================================================
+        if (mobileSidebarOpen)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: mobileHeaderHeight,
+            bottom: 0,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: closeMobileSidebar,
+              child: Container(color: Colors.black.withValues(alpha: 0.35)),
             ),
           ),
-        ],
-      ),
+
+        // =========================================================
+        // MOBILE SIDEBAR
+        // =========================================================
+        //
+        // Sidebar also starts BELOW the header.
+        //
+        // This prevents it from covering the hamburger button.
+        // =========================================================
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+
+          left: mobileSidebarOpen ? 0 : -270,
+
+          top: mobileHeaderHeight,
+          bottom: 0,
+
+          width: 270,
+
+          child: Material(
+            elevation: 16,
+            color: const Color(0xFF071A3D),
+
+            child: AppSidebar(
+              selectedMenu: selectedMenu,
+              onMenuSelected: selectMenu,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // =============================================================
+  // DESKTOP / TABLET LAYOUT
+  // =============================================================
+
+  Widget _buildDesktopLayout() {
+    return Column(
+      children: [
+        // =========================================================
+        // HEADER
+        // =========================================================
+
+        AppHeader(onMenuPressed: toggleSidebar),
+
+        // =========================================================
+        // MAIN AREA
+        // =========================================================
+        Expanded(
+          child: Row(
+            children: [
+              // ---------------------------------------------------
+              // SIDEBAR
+              // ---------------------------------------------------
+
+              if (sidebarOpen)
+                AppSidebar(
+                  selectedMenu: selectedMenu,
+                  onMenuSelected: selectMenu,
+                ),
+
+              // ---------------------------------------------------
+              // DASHBOARD
+              // ---------------------------------------------------
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: _buildDashboardContent(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // =============================================================
+  // DASHBOARD CONTENT
+  // =============================================================
+
+  Widget _buildDashboardContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // =========================================================
+        // TITLE
+        // =========================================================
+
+        const Text(
+          'Dashboard',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF172033),
+          ),
+        ),
+
+        const SizedBox(height: 6),
+
+        const Text(
+          'Welcome to OneCloud Enterprise Platform',
+          style: TextStyle(fontSize: 15, color: Color(0xFF64748B)),
+        ),
+
+        const SizedBox(height: 24),
+
+        // =========================================================
+        // KPI CARDS
+        // =========================================================
+        _buildKpiSection(),
+
+        const SizedBox(height: 24),
+
+        // =========================================================
+        // SALES + APPROVALS
+        // =========================================================
+        _buildSalesAndApprovalsSection(),
+
+        const SizedBox(height: 24),
+
+        // =========================================================
+        // QUICK ACCESS
+        // =========================================================
+        _buildQuickAccessCard(),
+
+        const SizedBox(height: 24),
+
+        // =========================================================
+        // AI RECOMMENDATIONS
+        // =========================================================
+        _buildAiRecommendationCard(),
+
+        const SizedBox(height: 30),
+
+        // =========================================================
+        // FOOTER
+        // =========================================================
+        const AppFooter(),
+      ],
     );
   }
 
@@ -204,51 +395,144 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildKpiSection() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double cardWidth;
+        final double availableWidth = constraints.maxWidth;
 
-        if (constraints.maxWidth >= 1100) {
-          cardWidth = (constraints.maxWidth - 48) / 4;
-        } else if (constraints.maxWidth >= 600) {
-          cardWidth = (constraints.maxWidth - 16) / 2;
+        int columns;
+
+        if (availableWidth >= 1100) {
+          columns = 4;
+        } else if (availableWidth >= 600) {
+          columns = 2;
         } else {
-          cardWidth = constraints.maxWidth;
+          columns = 1;
         }
 
+        const double spacing = 16;
+
+        final double cardWidth = columns == 1
+            ? availableWidth
+            : (availableWidth - ((columns - 1) * spacing)) / columns;
+
         return Wrap(
-          spacing: 16,
-          runSpacing: 16,
+          spacing: spacing,
+          runSpacing: spacing,
           children: [
-            DashboardCard(
+            _buildKpiCard(
               width: cardWidth,
               title: 'Revenue',
               value: '₹12.5M',
               subtitle: '+8.5% this month',
               icon: Icons.trending_up,
             ),
-            DashboardCard(
+
+            _buildKpiCard(
               width: cardWidth,
               title: 'Profit',
               value: '₹4.2M',
               subtitle: '+6.2% this month',
               icon: Icons.account_balance,
             ),
-            DashboardCard(
+
+            _buildKpiCard(
               width: cardWidth,
               title: 'Employees',
               value: '2,458',
               subtitle: 'Active employees',
-              icon: Icons.people,
+              icon: Icons.people_outline,
             ),
-            DashboardCard(
+
+            _buildKpiCard(
               width: cardWidth,
               title: 'Customers',
               value: '1,284',
               subtitle: '+12.4% growth',
-              icon: Icons.business,
+              icon: Icons.business_outlined,
             ),
           ],
         );
       },
+    );
+  }
+
+  // =============================================================
+  // KPI CARD
+  // =============================================================
+
+  Widget _buildKpiCard({
+    required double width,
+    required String title,
+    required String value,
+    required String subtitle,
+    required IconData icon,
+  }) {
+    return SizedBox(
+      width: width,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEAF3FF),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: const Color(0xFF0B6FF9), size: 26),
+            ),
+
+            const SizedBox(width: 16),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF172033),
+                    ),
+                  ),
+
+                  const SizedBox(height: 3),
+
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -263,7 +547,9 @@ class _DashboardPageState extends State<DashboardPage> {
           return Column(
             children: [
               _buildSalesPipelineCard(),
+
               const SizedBox(height: 20),
+
               _buildPendingApprovalsCard(),
             ],
           );
@@ -273,7 +559,9 @@ class _DashboardPageState extends State<DashboardPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: _buildSalesPipelineCard()),
+
             const SizedBox(width: 20),
+
             Expanded(child: _buildPendingApprovalsCard()),
           ],
         );
@@ -301,48 +589,63 @@ class _DashboardPageState extends State<DashboardPage> {
 
           const SizedBox(height: 20),
 
-          _buildPipelineRow('Leads', '428', 0.75),
+          _buildPipelineRow('Leads', '428', 0.85),
 
-          _buildPipelineRow('Opportunities', '186', 0.55),
+          const SizedBox(height: 18),
 
-          _buildPipelineRow('Quotations', '92', 0.38),
+          _buildPipelineRow('Opportunities', '186', 0.65),
 
-          _buildPipelineRow('Closed Deals', '47', 0.25),
+          const SizedBox(height: 18),
+
+          _buildPipelineRow('Quotations', '92', 0.45),
+
+          const SizedBox(height: 18),
+
+          _buildPipelineRow('Closed Deals', '47', 0.30),
         ],
       ),
     );
   }
 
+  // =============================================================
+  // PIPELINE ROW
+  // =============================================================
+
   Widget _buildPipelineRow(String title, String value, double progress) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: const TextStyle(color: Color(0xFF172033))),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF172033),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+            ),
+
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF172033),
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
 
-          const SizedBox(height: 8),
+        const SizedBox(height: 8),
 
-          LinearProgressIndicator(
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: LinearProgressIndicator(
             value: progress,
             minHeight: 7,
-            backgroundColor: const Color(0xFFE3EDF8),
-            valueColor: const AlwaysStoppedAnimation(Color(0xFF1877F2)),
+            backgroundColor: const Color(0xFFE6EDF5),
+            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF1877F2)),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -355,52 +658,33 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Pending Approvals',
-                style: TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF172033),
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F1FF),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  '8 Pending',
-                  style: TextStyle(
-                    color: Color(0xFF1877F2),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+          const Text(
+            'Pending Approvals',
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF172033),
+            ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
 
-          _buildApprovalRow(
-            Icons.receipt_long,
+          _approvalRow(
+            Icons.shopping_cart_outlined,
             'Purchase Request',
             '₹2,40,000',
           ),
 
-          _buildApprovalRow(Icons.person, 'Leave Request', '3 Employees'),
+          _approvalRow(Icons.person_outline, 'Leave Request', '3 Employees'),
 
-          _buildApprovalRow(Icons.account_balance, 'Expense Claim', '₹18,500'),
+          _approvalRow(
+            Icons.account_balance_outlined,
+            'Expense Claim',
+            '₹18,500',
+          ),
 
-          _buildApprovalRow(
-            Icons.description,
+          _approvalRow(
+            Icons.description_outlined,
             'Document Approval',
             '5 Documents',
           ),
@@ -409,21 +693,29 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildApprovalRow(IconData icon, String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+  // =============================================================
+  // APPROVAL ROW
+  // =============================================================
+
+  Widget _approvalRow(IconData icon, String title, String subtitle) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFE8EDF3))),
+      ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF4FF),
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFEAF3FF),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: const Color(0xFF1877F2)),
+            child: Icon(icon, color: const Color(0xFF0B6FF9)),
           ),
 
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
 
           Expanded(
             child: Column(
@@ -432,17 +724,18 @@ class _DashboardPageState extends State<DashboardPage> {
                 Text(
                   title,
                   style: const TextStyle(
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF172033),
                   ),
                 ),
 
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
 
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: Color(0xFF64748B),
                   ),
                 ),
@@ -450,7 +743,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
 
-          const Icon(Icons.chevron_right, color: Color(0xFF8A8D91)),
+          const Icon(Icons.chevron_right, color: Color(0xFF94A3B8)),
         ],
       ),
     );
@@ -461,6 +754,17 @@ class _DashboardPageState extends State<DashboardPage> {
   // =============================================================
 
   Widget _buildQuickAccessCard() {
+    final List<String> items = [
+      'Employees',
+      'Finance',
+      'Procurement',
+      'Inventory',
+      'Documents',
+      'Reports',
+      'AI Copilot',
+      'Calendar',
+    ];
+
     return _whiteCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -474,52 +778,36 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              _buildQuickButton(Icons.people, 'Employees'),
-
-              _buildQuickButton(Icons.attach_money, 'Finance'),
-
-              _buildQuickButton(Icons.shopping_cart, 'Procurement'),
-
-              _buildQuickButton(Icons.inventory, 'Inventory'),
-
-              _buildQuickButton(Icons.description, 'Documents'),
-
-              _buildQuickButton(Icons.analytics, 'Reports'),
-
-              _buildQuickButton(Icons.smart_toy, 'AI Copilot'),
-
-              _buildQuickButton(Icons.calendar_month, 'Calendar'),
-            ],
+            spacing: 10,
+            runSpacing: 10,
+            children: items.map((item) {
+              return OutlinedButton(
+                onPressed: () => openQuickAccess(item),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF0B6FF9),
+                  side: const BorderSide(color: Color(0xFFD6E5F8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(item),
+              );
+            }).toList(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuickButton(IconData icon, String title) {
-    return OutlinedButton.icon(
-      onPressed: () {
-        openQuickAccess(title);
-      },
-      icon: Icon(icon, size: 20),
-      label: Text(title),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF1877F2),
-        side: const BorderSide(color: Color(0xFFD6E4F5)),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
   // =============================================================
-  // AI RECOMMENDATIONS
+  // AI RECOMMENDATION
   // =============================================================
 
   Widget _buildAiRecommendationCard() {
@@ -528,16 +816,13 @@ class _DashboardPageState extends State<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFFE8F1FF),
-              borderRadius: BorderRadius.circular(12),
+              color: const Color(0xFFEAF3FF),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
-              Icons.auto_awesome,
-              size: 30,
-              color: Color(0xFF1877F2),
-            ),
+            child: const Icon(Icons.auto_awesome, color: Color(0xFF0B6FF9)),
           ),
 
           const SizedBox(width: 16),
@@ -549,17 +834,17 @@ class _DashboardPageState extends State<DashboardPage> {
                 Text(
                   'AI Recommendations',
                   style: TextStyle(
-                    fontSize: 19,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF172033),
                   ),
                 ),
 
-                SizedBox(height: 8),
+                SizedBox(height: 6),
 
                 Text(
                   'AI-powered recommendations and insights will appear here as Enterprise AI services are connected.',
-                  style: TextStyle(color: Color(0xFF64748B), height: 1.4),
+                  style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
                 ),
               ],
             ),
@@ -580,91 +865,16 @@ class _DashboardPageState extends State<DashboardPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE3EAF2)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: child,
-    );
-  }
-}
-
-// =============================================================
-// DASHBOARD KPI CARD
-// =============================================================
-
-class DashboardCard extends StatelessWidget {
-  final double width;
-  final String title;
-  final String value;
-  final String subtitle;
-  final IconData icon;
-
-  const DashboardCard({
-    super.key,
-    required this.width,
-    required this.title,
-    required this.value,
-    required this.subtitle,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE3EAF2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
-              ),
-
-              Icon(icon, color: const Color(0xFF1877F2)),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF172033),
-            ),
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            subtitle,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-          ),
-        ],
-      ),
     );
   }
 }
