@@ -36,11 +36,8 @@ class _SignupPageState extends State<SignupPage>
   // ================================================================
 
   late AnimationController _animationController;
-
   late Animation<double> _fadeAnimation;
-
   late Animation<double> _logoScaleAnimation;
-
   late Animation<Offset> _contentSlideAnimation;
 
   // ================================================================
@@ -56,13 +53,11 @@ class _SignupPageState extends State<SignupPage>
       duration: const Duration(milliseconds: 900),
     );
 
-    // Fade animation
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOut,
     );
 
-    // Logo animation
     _logoScaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -70,7 +65,6 @@ class _SignupPageState extends State<SignupPage>
       ),
     );
 
-    // Content animation
     _contentSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(
           CurvedAnimation(
@@ -95,31 +89,26 @@ class _SignupPageState extends State<SignupPage>
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
       _showMessage('Please fill all required fields.');
-
       return;
     }
 
     if (!emailController.text.contains('@')) {
       _showMessage('Please enter a valid email address.');
-
       return;
     }
 
     if (passwordController.text.length < 6) {
       _showMessage('Password must contain at least 6 characters.');
-
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
       _showMessage('Passwords do not match.');
-
       return;
     }
 
     if (!acceptTerms) {
       _showMessage('Please accept the Terms of Service and Privacy Policy.');
-
       return;
     }
 
@@ -127,7 +116,6 @@ class _SignupPageState extends State<SignupPage>
 
     Future.delayed(const Duration(milliseconds: 800), () {
       if (!mounted) return;
-
       Navigator.pushReplacementNamed(context, AppRoutes.login);
     });
   }
@@ -170,7 +158,6 @@ class _SignupPageState extends State<SignupPage>
     phoneController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
-
     _animationController.dispose();
 
     super.dispose();
@@ -184,21 +171,14 @@ class _SignupPageState extends State<SignupPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8FC),
-
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // ======================================================
             // DESKTOP
-            // ======================================================
-
             if (constraints.maxWidth >= 900) {
               return Row(
                 children: [
-                  // LEFT SIDE
                   Expanded(child: _buildLeftSection()),
-
-                  // RIGHT SIDE
                   Expanded(
                     child: SingleChildScrollView(child: _buildRightSection()),
                   ),
@@ -206,12 +186,7 @@ class _SignupPageState extends State<SignupPage>
               );
             }
 
-            // ======================================================
             // MOBILE
-            //
-            // ONE OUTER SCROLL VIEW
-            // ======================================================
-
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -229,643 +204,85 @@ class _SignupPageState extends State<SignupPage>
   // ================================================================
 
   Widget _buildLeftSection() {
-    // The reference artwork is based on a 600 x 817 design canvas.
-    // The coordinates below intentionally follow that canvas so the
-    // left panel keeps the same proportions at different desktop sizes.
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: const Color(0xFF0F1330),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final sx = constraints.maxWidth / 600.0;
-          final sy = constraints.maxHeight / 817.0;
-          final textScale = sx < sy ? sx : sy;
-
-          double x(double value) => value * sx;
-          double y(double value) => value * sy;
-          double t(double value) => value * textScale;
-
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              const Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: [0.0, 0.52, 1.0],
-                      colors: [
-                        Color(0xFF151B3F),
-                        Color(0xFF0F1330),
-                        Color(0xFF0C1028),
-                      ],
-                    ),
-                  ),
-                ),
+      color: Colors.black,
+      child: ClipRect(
+        child: Image.asset(
+          'assets/images/one_enterprise_left_full.png',
+          width: double.infinity,
+          height: double.infinity,
+          fit: BoxFit.contain,
+          alignment: Alignment.center,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Colors.black,
+              alignment: Alignment.center,
+              child: const Text(
+                'Unable to load One Enterprise artwork',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
-
-              // ------------------------------------------------------
-              // BRAND
-              // ------------------------------------------------------
-              Positioned(
-                left: x(69),
-                top: y(42),
-                child: Row(
-                  children: [
-                    Container(
-                      width: t(23),
-                      height: t(23),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(t(6)),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFFF0B72E), Color(0xFF69D8C2)],
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '1E',
-                        style: TextStyle(
-                          fontSize: t(8.8),
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.25,
-                          color: const Color(0xFF111530),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: t(11)),
-                    Text(
-                      'One Enterprise',
-                      style: TextStyle(
-                        fontSize: t(15.5),
-                        height: 1.0,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.15,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // ------------------------------------------------------
-              // CATEGORY LINE
-              // ------------------------------------------------------
-              Positioned(
-                left: x(69),
-                top: y(213),
-                right: x(42),
-                child: Text(
-                  'CLOUD PLATFORM  ·  HRMS  ·  CRM  ·  ERP  ·  FINANCE  ·  AI',
-                  maxLines: 1,
-                  overflow: TextOverflow.clip,
-                  style: TextStyle(
-                    fontSize: t(9.2),
-                    height: 1.0,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: t(2.55),
-                    color: const Color(0xFF35D3D2),
-                  ),
-                ),
-              ),
-
-              // ------------------------------------------------------
-              // MAIN HEADING
-              // ------------------------------------------------------
-              Positioned(
-                left: x(69),
-                top: y(243),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Every operation.',
-                      style: TextStyle(
-                        fontSize: t(36),
-                        height: 1.04,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -1.15 * textScale,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: t(1)),
-                    Text(
-                      'One sign-in.',
-                      style: TextStyle(
-                        fontSize: t(36),
-                        height: 1.04,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -1.15 * textScale,
-                        color: const Color(0xFFF2A82B),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // ------------------------------------------------------
-              // DESCRIPTION
-              // ------------------------------------------------------
-              Positioned(
-                left: x(69),
-                top: y(347),
-                right: x(66),
-                child: Text(
-                  'HR, sales, procurement, finance and your AI copilot – running\n'
-                  'on one identity, one policy, one audit trail.',
-                  style: TextStyle(
-                    fontSize: t(13.2),
-                    height: 1.58,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 0.02 * textScale,
-                    color: const Color(0xFFB9BED6),
-                  ),
-                ),
-              ),
-
-              // ------------------------------------------------------
-              // SYSTEM DIAGRAM
-              // ------------------------------------------------------
-              Positioned(
-                left: x(69),
-                top: y(430),
-                width: x(499),
-                height: y(160),
-                child: CustomPaint(
-                  painter: _EnterpriseDiagramPainter(),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      _diagramTargetLabel(
-                        label: 'HRMS',
-                        left: x(49),
-                        top: y(17),
-                        dotOnLeft: true,
-                        sx: sx,
-                        sy: sy,
-                        textScale: textScale,
-                      ),
-                      _diagramTargetLabel(
-                        label: 'CRM',
-                        left: x(49),
-                        top: y(65),
-                        dotOnLeft: true,
-                        sx: sx,
-                        sy: sy,
-                        textScale: textScale,
-                      ),
-                      _diagramTargetLabel(
-                        label: 'ERP',
-                        left: x(49),
-                        top: y(113),
-                        dotOnLeft: true,
-                        sx: sx,
-                        sy: sy,
-                        textScale: textScale,
-                      ),
-                      _diagramTargetLabel(
-                        label: 'FINANCE',
-                        right: x(49),
-                        top: y(17),
-                        dotOnLeft: false,
-                        sx: sx,
-                        sy: sy,
-                        textScale: textScale,
-                      ),
-                      _diagramTargetLabel(
-                        label: 'WORKFLOW',
-                        right: x(49),
-                        top: y(65),
-                        dotOnLeft: false,
-                        sx: sx,
-                        sy: sy,
-                        textScale: textScale,
-                      ),
-                      _diagramTargetLabel(
-                        label: 'ANALYTICS',
-                        right: x(49),
-                        top: y(113),
-                        dotOnLeft: false,
-                        sx: sx,
-                        sy: sy,
-                        textScale: textScale,
-                      ),
-                      Center(
-                        child: Container(
-                          width: t(39),
-                          height: t(39),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFF20285F),
-                            border: Border.all(
-                              color: const Color(0xFF39468C),
-                              width: t(1),
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'AI',
-                            style: TextStyle(
-                              fontSize: t(8.8),
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFFA2A9C9),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Container(
-                          width: t(50),
-                          height: t(50),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFFC28A28),
-                              width: t(1),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // ------------------------------------------------------
-              // TRUST / COMPLIANCE BAR
-              // ------------------------------------------------------
-              Positioned(
-                left: x(69),
-                right: x(50),
-                top: y(746),
-                child: Container(height: 1, color: const Color(0xFF282E48)),
-              ),
-              Positioned(
-                left: x(69),
-                right: x(50),
-                top: y(774),
-                child: Row(
-                  children: [
-                    _targetTrustItem(
-                      Icons.shield_outlined,
-                      'SOC 2 Type II',
-                      textScale,
-                    ),
-                    SizedBox(width: t(25)),
-                    _targetTrustItem(
-                      Icons.lock_outline,
-                      'ISO 27001',
-                      textScale,
-                    ),
-                    SizedBox(width: t(25)),
-                    _targetTrustItem(
-                      Icons.access_time,
-                      '99.95% uptime SLA',
-                      textScale,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _diagramTargetLabel({
-    required String label,
-    double? left,
-    double? right,
-    required double top,
-    required bool dotOnLeft,
-    required double sx,
-    required double sy,
-    required double textScale,
-  }) {
-    final row = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: dotOnLeft
-          ? [
-              _diagramTargetDot(textScale),
-              SizedBox(width: 8 * textScale),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 8.8 * textScale,
-                  height: 1,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF9AA3C5),
-                ),
-              ),
-            ]
-          : [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 8.8 * textScale,
-                  height: 1,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF9AA3C5),
-                ),
-              ),
-              SizedBox(width: 8 * textScale),
-              _diagramTargetDot(textScale),
-            ],
-    );
-
-    return Positioned(left: left, right: right, top: top, child: row);
-  }
-
-  Widget _diagramTargetDot(double scale) {
-    return Container(
-      width: 11 * scale,
-      height: 11 * scale,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: const Color(0xFF252D69),
-        border: Border.all(color: const Color(0xFF4C5798), width: 0.9 * scale),
-      ),
-    );
-  }
-
-  Widget _targetTrustItem(IconData icon, String text, double scale) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 10.5 * scale, color: const Color(0xFF8992B3)),
-        SizedBox(width: 5 * scale),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 8.5 * scale,
-            height: 1,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 0.75 * scale,
-            color: const Color(0xFF8992B3),
-          ),
+            );
+          },
         ),
-      ],
+      ),
     );
   }
 
   // ================================================================
-  // BRAND
+  // BRAND (MOBILE)
   // ================================================================
 
   Widget _buildBrand() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-
       children: [
-        // ----------------------------------------------------------
-        // CLOUD LOGO
-        // ----------------------------------------------------------
-
         ScaleTransition(
           scale: _logoScaleAnimation,
-
           child: Container(
             width: 65,
             height: 65,
-
             decoration: BoxDecoration(
               color: const Color(0xFF1877F2),
-
               borderRadius: BorderRadius.circular(17),
-
               boxShadow: [
                 BoxShadow(
                   color: const Color(0xFF1877F2).withValues(alpha: 0.20),
-
                   blurRadius: 18,
-
                   offset: const Offset(0, 7),
                 ),
               ],
             ),
-
             child: const Icon(
               Icons.cloud_outlined,
-
               color: Colors.white,
-
               size: 38,
             ),
           ),
         ),
-
         const SizedBox(width: 17),
-
-        // ----------------------------------------------------------
-        // BRAND NAME
-        // ----------------------------------------------------------
         const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             Text(
               'OneCloud',
-
               style: TextStyle(
                 fontSize: 29,
-
                 fontWeight: FontWeight.w700,
-
                 color: Color(0xFF1877F2),
               ),
             ),
-
             SizedBox(height: 2),
-
             Text(
               'Enterprise Platform',
-
               style: TextStyle(
                 fontSize: 13,
-
                 fontWeight: FontWeight.w600,
-
                 color: Color(0xFF667085),
               ),
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  // ================================================================
-  // MAIN HEADING
-  // ================================================================
-
-  Widget _buildMainHeading() {
-    return const Text(
-      'Smart Enterprise.\n'
-      'Stronger Operations.\n'
-      'Better Growth.',
-
-      style: TextStyle(
-        fontSize: 42,
-
-        height: 1.15,
-
-        fontWeight: FontWeight.w700,
-
-        color: Color(0xFF16233B),
-      ),
-    );
-  }
-
-  // ================================================================
-  // DESCRIPTION
-  // ================================================================
-
-  Widget _buildDescription() {
-    return const Text(
-      'Manage your people, customers, operations and '
-      'business workflows from one powerful enterprise platform.',
-
-      style: TextStyle(fontSize: 16, height: 1.55, color: Color(0xFF667892)),
-    );
-  }
-
-  // ================================================================
-  // FEATURES
-  // ================================================================
-
-  Widget _buildFeatures() {
-    return Column(
-      children: [
-        // ----------------------------------------------------------
-        // ROW 1
-        // ----------------------------------------------------------
-
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            Expanded(
-              child: _featureItem(
-                Icons.people_outline,
-                'Manage People',
-                'HRMS and employee management.',
-              ),
-            ),
-
-            const SizedBox(width: 35),
-
-            Expanded(
-              child: _featureItem(
-                Icons.handshake_outlined,
-                'Manage Customers',
-                'CRM and customer relationships.',
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 25),
-
-        // ----------------------------------------------------------
-        // ROW 2
-        // ----------------------------------------------------------
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
-            Expanded(
-              child: _featureItem(
-                Icons.account_balance_wallet_outlined,
-                'Manage Finance',
-                'Finance and accounting operations.',
-              ),
-            ),
-
-            const SizedBox(width: 35),
-
-            Expanded(
-              child: _featureItem(
-                Icons.bar_chart_outlined,
-                'Powerful Reports',
-                'Business insights and analytics.',
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // ================================================================
-  // FEATURE ITEM
-  // ================================================================
-
-  Widget _featureItem(IconData icon, String title, String description) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-
-      children: [
-        Container(
-          width: 56,
-          height: 56,
-
-          decoration: BoxDecoration(
-            color: Colors.white,
-
-            shape: BoxShape.circle,
-
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-
-                blurRadius: 12,
-
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-
-          child: Icon(icon, size: 25, color: const Color(0xFF1877F2)),
-        ),
-
-        const SizedBox(width: 14),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Text(
-                title,
-
-                style: const TextStyle(
-                  fontSize: 16,
-
-                  fontWeight: FontWeight.w700,
-
-                  color: Color(0xFF16233B),
-                ),
-              ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                description,
-
-                style: const TextStyle(
-                  fontSize: 12,
-
-                  height: 1.4,
-
-                  color: Color(0xFF667892),
-                ),
-              ),
-            ],
-          ),
         ),
       ],
     );
@@ -878,21 +295,15 @@ class _SignupPageState extends State<SignupPage>
   Widget _buildRightSection() {
     return Container(
       width: double.infinity,
-
       color: const Color(0xFFFAFBFD),
-
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 35),
-
       child: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
-
           child: SlideTransition(
             position: _contentSlideAnimation,
-
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
-
               child: _buildSignupCard(),
             ),
           ),
@@ -908,201 +319,130 @@ class _SignupPageState extends State<SignupPage>
   Widget _buildSignupCard() {
     return Container(
       width: double.infinity,
-
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 32),
-
       decoration: BoxDecoration(
         color: Colors.white,
-
         borderRadius: BorderRadius.circular(24),
-
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
-
             blurRadius: 30,
-
             offset: const Offset(0, 12),
           ),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
-          // ========================================================
-          // TITLE
-          // ========================================================
-
           const Text(
             'Create Account',
-
             style: TextStyle(
               fontSize: 28,
-
               fontWeight: FontWeight.w700,
-
               color: Color(0xFF172033),
             ),
           ),
-
           const SizedBox(height: 8),
-
           const Text(
             'Create your account to get started with OneCloud.',
-
             style: TextStyle(
               fontSize: 13,
-
               height: 1.5,
-
               color: Color(0xFF667085),
             ),
           ),
-
           const SizedBox(height: 25),
 
-          // ========================================================
           // FIRST NAME + LAST NAME
-          // ========================================================
           Row(
             children: [
               Expanded(
                 child: _buildTextField(
                   label: 'First Name',
-
                   hint: 'First name',
-
                   icon: Icons.person_outline,
-
                   controller: firstNameController,
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(
                 child: _buildTextField(
                   label: 'Last Name',
-
                   hint: 'Last name',
-
                   icon: Icons.person_outline,
-
                   controller: lastNameController,
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 17),
 
-          // ========================================================
           // USERNAME
-          // ========================================================
           _buildTextField(
             label: 'Username',
-
             hint: 'Enter username',
-
             icon: Icons.account_circle_outlined,
-
             controller: usernameController,
           ),
-
           const SizedBox(height: 17),
 
-          // ========================================================
           // EMAIL
-          // ========================================================
           _buildTextField(
             label: 'Email Address',
-
             hint: 'Enter email address',
-
             icon: Icons.email_outlined,
-
             controller: emailController,
-
             keyboardType: TextInputType.emailAddress,
           ),
-
           const SizedBox(height: 17),
 
-          // ========================================================
           // PHONE
-          // ========================================================
           _buildTextField(
             label: 'Phone Number',
-
             hint: 'Enter phone number',
-
             icon: Icons.phone_outlined,
-
             controller: phoneController,
-
             keyboardType: TextInputType.phone,
           ),
-
           const SizedBox(height: 17),
 
-          // ========================================================
           // PASSWORD
-          // ========================================================
           _buildPasswordField(
             label: 'Password',
-
             hint: 'Create password',
-
             controller: passwordController,
-
             hidePassword: hidePassword,
-
             onToggle: () {
               setState(() {
                 hidePassword = !hidePassword;
               });
             },
           ),
-
           const SizedBox(height: 17),
 
-          // ========================================================
           // CONFIRM PASSWORD
-          // ========================================================
           _buildPasswordField(
             label: 'Confirm Password',
-
             hint: 'Confirm password',
-
             controller: confirmPasswordController,
-
             hidePassword: hideConfirmPassword,
-
             onToggle: () {
               setState(() {
                 hideConfirmPassword = !hideConfirmPassword;
               });
             },
           ),
-
           const SizedBox(height: 18),
 
-          // ========================================================
           // TERMS
-          // ========================================================
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
               SizedBox(
                 width: 22,
                 height: 22,
-
                 child: Checkbox(
                   value: acceptTerms,
-
                   onChanged: (value) {
                     setState(() {
                       acceptTerms = value ?? false;
@@ -1110,41 +450,29 @@ class _SignupPageState extends State<SignupPage>
                   },
                 ),
               ),
-
               const SizedBox(width: 8),
-
               Expanded(
                 child: RichText(
                   text: const TextSpan(
                     style: TextStyle(
                       fontSize: 12,
-
                       height: 1.4,
-
                       color: Color(0xFF667085),
                     ),
-
                     children: [
                       TextSpan(text: 'I agree to the '),
-
                       TextSpan(
                         text: 'Terms of Service',
-
                         style: TextStyle(
                           color: Color(0xFF1976D2),
-
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-
                       TextSpan(text: ' and '),
-
                       TextSpan(
                         text: 'Privacy Policy',
-
                         style: TextStyle(
                           color: Color(0xFF1976D2),
-
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1154,92 +482,62 @@ class _SignupPageState extends State<SignupPage>
               ),
             ],
           ),
-
           const SizedBox(height: 22),
 
-          // ========================================================
-          // CREATE ACCOUNT
-          // ========================================================
+          // CREATE ACCOUNT BUTTON
           SizedBox(
             width: double.infinity,
-
             height: 50,
-
             child: ElevatedButton(
               onPressed: createAccount,
-
               style: _buttonStyle(),
-
               child: const Text(
                 'Create Account',
-
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
               ),
             ),
           ),
-
           const SizedBox(height: 25),
 
-          // ========================================================
           // OR DIVIDER
-          // ========================================================
           Row(
             children: [
               Expanded(child: Divider(color: Colors.grey.shade300)),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14),
-
                 child: Text(
                   'OR',
-
                   style: TextStyle(fontSize: 11, color: Color(0xFF98A2B3)),
                 ),
               ),
-
               Expanded(child: Divider(color: Colors.grey.shade300)),
             ],
           ),
-
           const SizedBox(height: 20),
 
-          // ========================================================
           // GOOGLE SIGN UP
-          // ========================================================
           SizedBox(
             width: double.infinity,
-
             height: 48,
-
             child: OutlinedButton(
               onPressed: signupWithGoogle,
-
               style: OutlinedButton.styleFrom(
                 backgroundColor: Colors.white,
-
                 side: const BorderSide(color: Color(0xFFE1E6ED)),
-
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: [
                   _googleIcon(),
-
                   const SizedBox(width: 10),
-
                   const Text(
                     'Sign up with Google',
-
                     style: TextStyle(
                       fontSize: 13,
-
                       fontWeight: FontWeight.w600,
-
                       color: Color(0xFF344054),
                     ),
                   ),
@@ -1247,46 +545,31 @@ class _SignupPageState extends State<SignupPage>
               ),
             ),
           ),
-
           const SizedBox(height: 12),
 
-          // ========================================================
           // APPLE SIGN UP
-          // ========================================================
           SizedBox(
             width: double.infinity,
-
             height: 48,
-
             child: OutlinedButton(
               onPressed: signupWithApple,
-
               style: OutlinedButton.styleFrom(
                 backgroundColor: Colors.white,
-
                 side: const BorderSide(color: Color(0xFFE1E6ED)),
-
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: [
-                  const Icon(Icons.apple, size: 22, color: Colors.black),
-
-                  const SizedBox(width: 10),
-
-                  const Text(
+                  Icon(Icons.apple, size: 22, color: Colors.black),
+                  SizedBox(width: 10),
+                  Text(
                     'Sign up with Apple',
-
                     style: TextStyle(
                       fontSize: 13,
-
                       fontWeight: FontWeight.w600,
-
                       color: Color(0xFF344054),
                     ),
                   ),
@@ -1294,31 +577,23 @@ class _SignupPageState extends State<SignupPage>
               ),
             ),
           ),
-
           const SizedBox(height: 22),
 
-          // ========================================================
-          // LOGIN
-          // ========================================================
+          // LOGIN LINK
           Center(
             child: GestureDetector(
               onTap: () {
                 Navigator.pushReplacementNamed(context, AppRoutes.login);
               },
-
               child: RichText(
                 text: const TextSpan(
                   style: TextStyle(fontSize: 13, color: Color(0xFF667085)),
-
                   children: [
                     TextSpan(text: 'Already have an account? '),
-
                     TextSpan(
                       text: 'Login',
-
                       style: TextStyle(
                         color: Color(0xFF1976D2),
-
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1345,36 +620,24 @@ class _SignupPageState extends State<SignupPage>
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-
       children: [
         Text(
           label,
-
           style: const TextStyle(
             fontSize: 13,
-
             fontWeight: FontWeight.w700,
-
             color: Color(0xFF344054),
           ),
         ),
-
         const SizedBox(height: 7),
-
         TextField(
           controller: controller,
-
           keyboardType: keyboardType,
-
           decoration: InputDecoration(
             hintText: hint,
-
             prefixIcon: Icon(icon, size: 20),
-
             border: _inputBorder(),
-
             enabledBorder: _inputBorder(),
-
             focusedBorder: _focusedInputBorder(),
           ),
         ),
@@ -1395,48 +658,33 @@ class _SignupPageState extends State<SignupPage>
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-
       children: [
         Text(
           label,
-
           style: const TextStyle(
             fontSize: 13,
-
             fontWeight: FontWeight.w700,
-
             color: Color(0xFF344054),
           ),
         ),
-
         const SizedBox(height: 7),
-
         TextField(
           controller: controller,
-
           obscureText: hidePassword,
-
           decoration: InputDecoration(
             hintText: hint,
-
             prefixIcon: const Icon(Icons.lock_outline, size: 20),
-
             suffixIcon: IconButton(
               onPressed: onToggle,
-
               icon: Icon(
                 hidePassword
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-
                 size: 20,
               ),
             ),
-
             border: _inputBorder(),
-
             enabledBorder: _inputBorder(),
-
             focusedBorder: _focusedInputBorder(),
           ),
         ),
@@ -1451,12 +699,9 @@ class _SignupPageState extends State<SignupPage>
   Widget _googleIcon() {
     return const Text(
       'G',
-
       style: TextStyle(
         fontSize: 20,
-
         fontWeight: FontWeight.w800,
-
         color: Color(0xFF4285F4),
       ),
     );
@@ -1469,23 +714,19 @@ class _SignupPageState extends State<SignupPage>
   ButtonStyle _buttonStyle() {
     return ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF1268E8),
-
       foregroundColor: Colors.white,
-
       elevation: 2,
-
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
     );
   }
 
   // ================================================================
-  // INPUT BORDER
+  // INPUT BORDERS
   // ================================================================
 
   OutlineInputBorder _inputBorder() {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(25),
-
       borderSide: const BorderSide(color: Color(0xFFE1E6ED)),
     );
   }
@@ -1493,7 +734,6 @@ class _SignupPageState extends State<SignupPage>
   OutlineInputBorder _focusedInputBorder() {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(25),
-
       borderSide: const BorderSide(color: Color(0xFF1976D2), width: 1.5),
     );
   }
@@ -1505,77 +745,52 @@ class _SignupPageState extends State<SignupPage>
   Widget _buildMobileBrandSection() {
     return Container(
       width: double.infinity,
-
       padding: const EdgeInsets.fromLTRB(28, 30, 28, 35),
-
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-
           colors: [Color(0xFFEAF4FF), Color(0xFFDCEEFF)],
         ),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           _buildBrand(),
-
           const SizedBox(height: 30),
-
           const Text(
             'Smart Enterprise.',
-
             style: TextStyle(
               fontSize: 30,
-
               fontWeight: FontWeight.w700,
-
               color: Color(0xFF16233B),
             ),
           ),
-
           const SizedBox(height: 4),
-
           const Text(
             'Stronger Operations.',
-
             style: TextStyle(
               fontSize: 30,
-
               fontWeight: FontWeight.w700,
-
               color: Color(0xFF1877F2),
             ),
           ),
-
           const SizedBox(height: 4),
-
           const Text(
             'Better Growth.',
-
             style: TextStyle(
               fontSize: 30,
-
               fontWeight: FontWeight.w700,
-
               color: Color(0xFF16233B),
             ),
           ),
-
           const SizedBox(height: 15),
-
           const Text(
             'Manage your people, customers, operations and '
             'business workflows from one powerful enterprise platform.',
-
             style: TextStyle(
               fontSize: 14,
-
               height: 1.5,
-
               color: Color(0xFF667892),
             ),
           ),
@@ -1583,128 +798,4 @@ class _SignupPageState extends State<SignupPage>
       ),
     );
   }
-
-  // ================================================================
-  // BACKGROUND CIRCLE
-  // ================================================================
-
-  Widget _backgroundCircle({required double size, required double alpha}) {
-    return Container(
-      width: size,
-
-      height: size,
-
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-
-        color: const Color(0xFF1877F2).withValues(alpha: alpha),
-      ),
-    );
-  }
-}
-
-class _EnterpriseDiagramPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Coordinates are normalized to the 499 x 160 reference diagram.
-    final sx = size.width / 499.0;
-    final sy = size.height / 160.0;
-    final center = Offset(size.width / 2, size.height / 2);
-
-    final leftX = 20.0 * sx;
-    final rightX = size.width - 20.0 * sx;
-    final topY = 23.0 * sy;
-    final middleY = 80.0 * sy;
-    final bottomY = 137.0 * sy;
-
-    final centerLeft = Offset(center.dx - 25.0 * sx, center.dy);
-    final centerRight = Offset(center.dx + 25.0 * sx, center.dy);
-
-    final solidPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.9 * (sx < sy ? sx : sy)
-      ..color = const Color(0xFF2A969C).withValues(alpha: 0.95);
-
-    final dashedPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.85 * (sx < sy ? sx : sy)
-      ..color = const Color(0xFF34427D).withValues(alpha: 0.9);
-
-    final leftTop = Path()
-      ..moveTo(leftX, topY)
-      ..cubicTo(
-        size.width * 0.30,
-        topY,
-        size.width * 0.40,
-        center.dy - 22 * sy,
-        centerLeft.dx,
-        center.dy,
-      );
-
-    final leftMiddle = Path()
-      ..moveTo(leftX, middleY)
-      ..lineTo(centerLeft.dx, middleY);
-
-    final leftBottom = Path()
-      ..moveTo(leftX, bottomY)
-      ..cubicTo(
-        size.width * 0.30,
-        bottomY,
-        size.width * 0.40,
-        center.dy + 22 * sy,
-        centerLeft.dx,
-        center.dy,
-      );
-
-    final rightTop = Path()
-      ..moveTo(rightX, topY)
-      ..cubicTo(
-        size.width * 0.70,
-        topY,
-        size.width * 0.60,
-        center.dy - 22 * sy,
-        centerRight.dx,
-        center.dy,
-      );
-
-    final rightMiddle = Path()
-      ..moveTo(centerRight.dx, middleY)
-      ..lineTo(rightX, middleY);
-
-    final rightBottom = Path()
-      ..moveTo(centerRight.dx, center.dy)
-      ..cubicTo(
-        size.width * 0.60,
-        center.dy + 22 * sy,
-        size.width * 0.70,
-        bottomY,
-        rightX,
-        bottomY,
-      );
-
-    canvas.drawPath(leftTop, solidPaint);
-    canvas.drawPath(leftMiddle, solidPaint);
-    _drawDashedPath(canvas, leftBottom, dashedPaint);
-
-    canvas.drawPath(rightTop, solidPaint);
-    _drawDashedPath(canvas, rightMiddle, dashedPaint);
-    _drawDashedPath(canvas, rightBottom, dashedPaint);
-  }
-
-  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
-    for (final metric in path.computeMetrics()) {
-      final dashLength = 4.5 * (paint.strokeWidth / 0.85);
-      final gapLength = 5.0 * (paint.strokeWidth / 0.85);
-      var distance = 0.0;
-
-      while (distance < metric.length) {
-        final end = (distance + dashLength).clamp(0.0, metric.length);
-        canvas.drawPath(metric.extractPath(distance, end), paint);
-        distance += dashLength + gapLength;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _EnterpriseDiagramPainter oldDelegate) => false;
 }
