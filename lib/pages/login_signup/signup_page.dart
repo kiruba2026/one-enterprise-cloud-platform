@@ -10,17 +10,12 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  // Current active step: 1, 2, or 3
   int _currentStep = 1;
 
-  // -------------------------------------------------------------
-  // STEP 1: ORGANIZATION CONTROLLERS & VALUES (ALL EMPTY)
-  // -------------------------------------------------------------
   final TextEditingController _orgNameController = TextEditingController();
   final TextEditingController _orgCodeController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
 
-  // Flag to know if user chose to edit code manually
   bool _isManualCodeEdit = false;
 
   String _orgType = 'Enterprise';
@@ -30,9 +25,6 @@ class _SignupPageState extends State<SignupPage> {
   String _stateProvince = 'Telangana';
   String _timeZone = 'Asia/Kolkata (UTC +05:30)';
 
-  // -------------------------------------------------------------
-  // STEP 2: ADMIN ACCOUNT CONTROLLERS (ALL EMPTY, NO SUGGESTIONS)
-  // -------------------------------------------------------------
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _officialEmailController =
@@ -46,9 +38,6 @@ class _SignupPageState extends State<SignupPage> {
   bool _hidePassword = true;
   bool _hideConfirmPassword = true;
 
-  // -------------------------------------------------------------
-  // STEP 3: REVIEW & CONFIRM CHECKBOXES
-  // -------------------------------------------------------------
   bool _agreeTermsAndPrivacy = false;
   bool _confirmAuthorized = false;
   bool _agreeDpa = false;
@@ -168,22 +157,62 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
             if (constraints.maxWidth >= 900) {
               return Row(
                 children: [
                   Expanded(child: _buildLeftSection()),
-                  Expanded(child: _buildRightSection()),
+                  Expanded(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 44.0,
+                          vertical: 40.0,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 580),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 250),
+                            child: _buildStepWidget(isMobile: false),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               );
             }
+
             return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(bottom: 95.0 + bottomInset),
               child: Column(
-                children: [_buildMobileHeader(), _buildRightSection()],
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildMobileHeader(),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 20.0,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 580),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: _buildStepWidget(isMobile: true),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -192,9 +221,7 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  // ============================================================
-  // LEFT ENTERPRISE ARTWORK (UNTOUCHED)
-  // ============================================================
+  // Left banner uses one_enterprise_left_full.png
   Widget _buildLeftSection() {
     return Container(
       width: double.infinity,
@@ -208,16 +235,6 @@ class _SignupPageState extends State<SignupPage> {
         fit: BoxFit.contain,
         filterQuality: FilterQuality.high,
         gaplessPlayback: true,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.black,
-            alignment: Alignment.center,
-            child: const Text(
-              'Unable to load One Enterprise artwork',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
-            ),
-          );
-        },
       ),
     );
   }
@@ -248,50 +265,19 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  // ============================================================
-  // RIGHT WORKSTATION SECTION
-  // ============================================================
-  Widget _buildRightSection() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = MediaQuery.of(context).size.width < 600;
-        final double horizontalPadding = isMobile ? 20.0 : 44.0;
-
-        return Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: isMobile ? 24.0 : 40.0,
-            ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 580),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: _buildStepWidget(),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildStepWidget() {
+  Widget _buildStepWidget({required bool isMobile}) {
     switch (_currentStep) {
       case 1:
-        return _buildStep1Organization();
+        return _buildStep1Organization(isMobile: isMobile);
       case 2:
-        return _buildStep2AdminAccount();
+        return _buildStep2AdminAccount(isMobile: isMobile);
       case 3:
-        return _buildStep3ReviewAndConfirm();
+        return _buildStep3ReviewAndConfirm(isMobile: isMobile);
       default:
-        return _buildStep1Organization();
+        return _buildStep1Organization(isMobile: isMobile);
     }
   }
 
-  // ------------------------------------------------------------
-  // STEP PROGRESS BAR (3 Segments)
-  // ------------------------------------------------------------
   Widget _buildStepProgress(int current) {
     return Row(
       children: [
@@ -342,11 +328,11 @@ class _SignupPageState extends State<SignupPage> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(4),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.chevron_left, size: 20, color: Color(0xFF64748B)),
               SizedBox(width: 4),
               Text(
@@ -364,16 +350,13 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  // ============================================================
-  // STEP 1: ORGANIZATION DETAILS
-  // ============================================================
-  Widget _buildStep1Organization() {
+  Widget _buildStep1Organization({required bool isMobile}) {
     return Column(
       key: const ValueKey(1),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildStepProgress(1),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
         const Text(
           'STEP 1 OF 3  ·  ORGANIZATION DETAILS',
           style: TextStyle(
@@ -383,32 +366,30 @@ class _SignupPageState extends State<SignupPage> {
             color: Color(0xFF6B7280),
           ),
         ),
-        const SizedBox(height: 10),
-        const Text(
+        const SizedBox(height: 8),
+        Text(
           'Tell us about your organization',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: isMobile ? 28 : 32,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF0F172A),
+            color: const Color(0xFF0F172A),
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         const Text(
           "This creates your organization's workspace on One Enterprise.",
           style: TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.4),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
 
-        // Organization Name
         _buildFieldLabel('Organization Name'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildTextInput(controller: _orgNameController),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Organization Code
         _buildFieldLabel('Organization Code'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildTextInput(
           controller: _orgCodeController,
           onChanged: (val) {
@@ -439,21 +420,19 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Organization Type
         _buildFieldLabel('Organization Type'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildDropdownInput(
           value: _orgType,
           items: const ['Enterprise', 'Mid-market', 'Startup', 'Government'],
           onChanged: (val) => setState(() => _orgType = val!),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Industry
         _buildFieldLabel('Industry'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildDropdownInput(
           value: _industry,
           items: const [
@@ -465,19 +444,17 @@ class _SignupPageState extends State<SignupPage> {
           ],
           onChanged: (val) => setState(() => _industry = val!),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Company Size
         _buildFieldLabel('Company Size'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildDropdownInput(
           value: _companySize,
           items: const ['1-50', '51-200', '201-500', '501-1000', '1000+'],
           onChanged: (val) => setState(() => _companySize = val!),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Country & State/Province Row
         Row(
           children: [
             Expanded(
@@ -485,7 +462,7 @@ class _SignupPageState extends State<SignupPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('Country'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildDropdownInput(
                     value: _country,
                     items: const [
@@ -500,13 +477,13 @@ class _SignupPageState extends State<SignupPage> {
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('State / Province'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildDropdownInput(
                     value: _stateProvince,
                     items: const [
@@ -523,9 +500,8 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // City & Time Zone Row
         Row(
           children: [
             Expanded(
@@ -533,18 +509,18 @@ class _SignupPageState extends State<SignupPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('City'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildTextInput(controller: _cityController),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('Time Zone'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildDropdownInput(
                     value: _timeZone,
                     items: const [
@@ -560,21 +536,17 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ],
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
 
-        // Continue Button
         _primaryDarkButton(label: 'Continue', onPressed: _onStep1Continue),
-        const SizedBox(height: 36),
+        const SizedBox(height: 20),
 
         _buildFooterSignInLink(),
       ],
     );
   }
 
-  // ============================================================
-  // STEP 2: SUPER ADMIN ACCOUNT (COMPLETELY BLANK)
-  // ============================================================
-  Widget _buildStep2AdminAccount() {
+  Widget _buildStep2AdminAccount({required bool isMobile}) {
     final orgDisplayName = _orgNameController.text.trim().isEmpty
         ? 'your organization'
         : _orgNameController.text.trim();
@@ -584,9 +556,9 @@ class _SignupPageState extends State<SignupPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildBackRow(onTap: () => setState(() => _currentStep = 1)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         _buildStepProgress(2),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
         const Text(
           'STEP 2 OF 3  ·  SUPER ADMIN ACCOUNT',
           style: TextStyle(
@@ -596,17 +568,17 @@ class _SignupPageState extends State<SignupPage> {
             color: Color(0xFF6B7280),
           ),
         ),
-        const SizedBox(height: 10),
-        const Text(
+        const SizedBox(height: 8),
+        Text(
           'Create your admin account',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: isMobile ? 28 : 32,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF0F172A),
+            color: const Color(0xFF0F172A),
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           "This is the account you'll use to manage $orgDisplayName.",
           style: const TextStyle(
@@ -615,11 +587,10 @@ class _SignupPageState extends State<SignupPage> {
             height: 1.4,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
-        // Super Admin Info Banner
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: const Color(0xFFEEF2FF),
             borderRadius: BorderRadius.circular(12),
@@ -629,8 +600,8 @@ class _SignupPageState extends State<SignupPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -641,14 +612,14 @@ class _SignupPageState extends State<SignupPage> {
                   color: Color(0xFF4F46E5),
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: RichText(
                   text: const TextSpan(
                     style: TextStyle(
                       fontSize: 13,
                       color: Color(0xFF334155),
-                      height: 1.45,
+                      height: 1.4,
                     ),
                     children: [
                       TextSpan(
@@ -672,9 +643,8 @@ class _SignupPageState extends State<SignupPage> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
-        // First Name & Last Name Row
         Row(
           children: [
             Expanded(
@@ -682,51 +652,47 @@ class _SignupPageState extends State<SignupPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('First Name'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildTextInput(controller: _firstNameController),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('Last Name'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildTextInput(controller: _lastNameController),
                 ],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Official Email
         _buildFieldLabel('Official Email'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildTextInput(
           controller: _officialEmailController,
           keyboardType: TextInputType.emailAddress,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Mobile Number
         _buildFieldLabel('Mobile Number'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildTextInput(
           controller: _mobileNumberController,
           keyboardType: TextInputType.phone,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Username
         _buildFieldLabel('Username'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildTextInput(controller: _usernameController),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
-        // Password & Confirm Password Row
         Row(
           children: [
             Expanded(
@@ -734,7 +700,7 @@ class _SignupPageState extends State<SignupPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('Password'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildPasswordInput(
                     controller: _passwordController,
                     hide: _hidePassword,
@@ -744,13 +710,13 @@ class _SignupPageState extends State<SignupPage> {
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFieldLabel('Confirm Password'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   _buildPasswordInput(
                     controller: _confirmPasswordController,
                     hide: _hideConfirmPassword,
@@ -766,23 +732,19 @@ class _SignupPageState extends State<SignupPage> {
         const SizedBox(height: 6),
         const Text(
           'Minimum 8 characters, with at least one number and one symbol.',
-          style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+          style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
 
-        // Continue Button
         _primaryDarkButton(label: 'Continue', onPressed: _onStep2Continue),
-        const SizedBox(height: 36),
+        const SizedBox(height: 20),
 
         _buildFooterSignInLink(),
       ],
     );
   }
 
-  // ============================================================
-  // STEP 3: REVIEW AND CONFIRM
-  // ============================================================
-  Widget _buildStep3ReviewAndConfirm() {
+  Widget _buildStep3ReviewAndConfirm({required bool isMobile}) {
     final orgDisplayName = _orgNameController.text.trim().isEmpty
         ? 'your organization'
         : _orgNameController.text.trim();
@@ -792,9 +754,9 @@ class _SignupPageState extends State<SignupPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildBackRow(onTap: () => setState(() => _currentStep = 2)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         _buildStepProgress(3),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
         const Text(
           'STEP 3 OF 3  ·  TERMS & AUTHORIZATION',
           style: TextStyle(
@@ -804,17 +766,17 @@ class _SignupPageState extends State<SignupPage> {
             color: Color(0xFF6B7280),
           ),
         ),
-        const SizedBox(height: 10),
-        const Text(
+        const SizedBox(height: 8),
+        Text(
           'Review and confirm',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: isMobile ? 28 : 32,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF0F172A),
+            color: const Color(0xFF0F172A),
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           "One last step before we create $orgDisplayName's workspace.",
           style: const TextStyle(
@@ -823,11 +785,10 @@ class _SignupPageState extends State<SignupPage> {
             height: 1.4,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
 
-        // Terms Box with 4 Checkboxes
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
@@ -836,14 +797,13 @@ class _SignupPageState extends State<SignupPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Checkbox 1
               _buildCheckboxRow(
                 value: _agreeTermsAndPrivacy,
                 onChanged: (val) =>
                     setState(() => _agreeTermsAndPrivacy = val ?? false),
                 textSpan: const TextSpan(
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     color: Color(0xFF334155),
                     height: 1.4,
                   ),
@@ -868,16 +828,15 @@ class _SignupPageState extends State<SignupPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Checkbox 2
               _buildCheckboxRow(
                 value: _confirmAuthorized,
                 onChanged: (val) =>
                     setState(() => _confirmAuthorized = val ?? false),
                 textSpan: TextSpan(
                   style: const TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     color: Color(0xFF334155),
                     height: 1.4,
                   ),
@@ -898,15 +857,14 @@ class _SignupPageState extends State<SignupPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Checkbox 3
               _buildCheckboxRow(
                 value: _agreeDpa,
                 onChanged: (val) => setState(() => _agreeDpa = val ?? false),
                 textSpan: const TextSpan(
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     color: Color(0xFF334155),
                     height: 1.4,
                   ),
@@ -925,16 +883,15 @@ class _SignupPageState extends State<SignupPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Checkbox 4 (Optional)
               _buildCheckboxRow(
                 value: _sendProductUpdates,
                 onChanged: (val) =>
                     setState(() => _sendProductUpdates = val ?? false),
                 textSpan: const TextSpan(
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     color: Color(0xFF334155),
                     height: 1.4,
                   ),
@@ -957,23 +914,19 @@ class _SignupPageState extends State<SignupPage> {
             ],
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
 
-        // Create Account Button
         _primaryDarkButton(
           label: 'Create account',
           onPressed: _onCreateAccount,
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 20),
 
         _buildFooterSignInLink(),
       ],
     );
   }
 
-  // ============================================================
-  // WIDGET HELPERS
-  // ============================================================
   Widget _buildFieldLabel(String label) {
     return RichText(
       text: TextSpan(
@@ -999,7 +952,7 @@ class _SignupPageState extends State<SignupPage> {
     ValueChanged<String>? onChanged,
   }) {
     return SizedBox(
-      height: 48,
+      height: 46,
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
@@ -1030,7 +983,7 @@ class _SignupPageState extends State<SignupPage> {
     required VoidCallback onToggle,
   }) {
     return SizedBox(
-      height: 48,
+      height: 46,
       child: TextField(
         controller: controller,
         obscureText: hide,
@@ -1068,7 +1021,7 @@ class _SignupPageState extends State<SignupPage> {
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
-      height: 48,
+      height: 46,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1125,7 +1078,7 @@ class _SignupPageState extends State<SignupPage> {
     required VoidCallback onPressed,
   }) {
     return SizedBox(
-      height: 48,
+      height: 46,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -1148,19 +1101,22 @@ class _SignupPageState extends State<SignupPage> {
     return Center(
       child: GestureDetector(
         onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
-        child: RichText(
-          text: const TextSpan(
-            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-            children: [
-              TextSpan(text: 'Already have an organization? '),
-              TextSpan(
-                text: 'Sign in',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF2563EB),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: RichText(
+            text: const TextSpan(
+              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+              children: [
+                TextSpan(text: 'Already have an organization? '),
+                TextSpan(
+                  text: 'Sign in',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF2563EB),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -25,33 +25,46 @@ class _DashboardPageState extends State<DashboardPage> {
   // Mobile sidebar
   bool mobileSidebarOpen = false;
 
-  // Header height used on mobile.
-  // The sidebar starts BELOW the header so the hamburger button
-  // remains visible.
+  // Header height used on mobile
   static const double mobileHeaderHeight = 72;
+
+  // Parent sections that toggle sub-menus and must not close the sidebar
+  static const Set<String> _parentSections = {
+    'Platform Administration',
+    'HRMS',
+    'CRM',
+    'ERP',
+    'Finance & Accounting',
+    'Workflow & Automation',
+    'Document Management',
+    'Subscription',
+    'Revenue',
+    'Reporting & BI',
+    'Enterprise AI',
+    'Notification',
+    'Calendar',
+    'Integration',
+    'Search',
+    'Security & Compliance',
+  };
 
   // =============================================================
   // MENU SELECTION
   // =============================================================
 
   void selectMenu(String menu) {
+    if (_parentSections.contains(menu)) {
+      return;
+    }
+
     setState(() {
       selectedMenu = menu;
       mobileSidebarOpen = false;
     });
 
-    // -------------------------------------------------------------
-    // OPTIONAL NAVIGATION
-    // -------------------------------------------------------------
-    //
-    // Dashboard itself stays on this page.
-    // Other menu pages can be connected here later through
-    // AppRoutes.
-    //
     switch (menu) {
       case 'Dashboard':
         break;
-
       default:
         _navigateToMenu(menu);
         break;
@@ -63,13 +76,6 @@ class _DashboardPageState extends State<DashboardPage> {
   // =============================================================
 
   void _navigateToMenu(String menu) {
-    // Keep dashboard UI stable.
-    //
-    // AppSidebar contains many menu items and sub-menu items.
-    // We only navigate when the corresponding route exists.
-    //
-    // These can be expanded later as the actual pages are built.
-
     final Map<String, String> routes = {
       'Employees': AppRoutes.employeeManagement,
       'Finance': AppRoutes.generalLedger,
@@ -82,7 +88,6 @@ class _DashboardPageState extends State<DashboardPage> {
     };
 
     final String? route = routes[menu];
-
     if (route != null) {
       Navigator.pushNamed(context, route);
     }
@@ -125,31 +130,24 @@ class _DashboardPageState extends State<DashboardPage> {
       case 'Employees':
         Navigator.pushNamed(context, AppRoutes.employeeManagement);
         break;
-
       case 'Finance':
         Navigator.pushNamed(context, AppRoutes.generalLedger);
         break;
-
       case 'Procurement':
         Navigator.pushNamed(context, AppRoutes.procurement);
         break;
-
       case 'Inventory':
         Navigator.pushNamed(context, AppRoutes.inventory);
         break;
-
       case 'Documents':
         Navigator.pushNamed(context, AppRoutes.documentRepository);
         break;
-
       case 'Reports':
         Navigator.pushNamed(context, AppRoutes.standardReports);
         break;
-
       case 'AI Copilot':
         Navigator.pushNamed(context, AppRoutes.aiChatCopilot);
         break;
-
       case 'Calendar':
         Navigator.pushNamed(context, AppRoutes.userCalendars);
         break;
@@ -164,25 +162,19 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F8FC),
+      body: SafeArea(
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double width = constraints.maxWidth;
 
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double width = constraints.maxWidth;
+            if (width < 700) {
+              return _buildMobileLayout();
+            }
 
-          // =======================================================
-          // MOBILE
-          // =======================================================
-
-          if (width < 700) {
-            return _buildMobileLayout();
-          }
-
-          // =======================================================
-          // TABLET / DESKTOP
-          // =======================================================
-
-          return _buildDesktopLayout();
-        },
+            return _buildDesktopLayout();
+          },
+        ),
       ),
     );
   }
@@ -194,49 +186,24 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildMobileLayout() {
     return Stack(
       children: [
-        // =========================================================
-        // MAIN MOBILE CONTENT
-        // =========================================================
-
+        // MAIN CONTENT
         Column(
           children: [
-            // -----------------------------------------------------
-            // HEADER
-            // -----------------------------------------------------
-
-            SizedBox(
-              height: mobileHeaderHeight,
-              child: AppHeader(onMenuPressed: toggleMobileSidebar),
-            ),
-
-            // -----------------------------------------------------
-            // DASHBOARD
-            // -----------------------------------------------------
+            AppHeader(onMenuPressed: toggleMobileSidebar),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                 child: _buildDashboardContent(),
               ),
             ),
           ],
         ),
 
-        // =========================================================
         // DARK OVERLAY
-        // =========================================================
-        //
-        // IMPORTANT:
-        // The overlay starts BELOW the header.
-        //
-        // Therefore the hamburger button remains visible and
-        // clickable.
-        // =========================================================
         if (mobileSidebarOpen)
-          Positioned(
-            left: 0,
-            right: 0,
+          Positioned.fill(
             top: mobileHeaderHeight,
-            bottom: 0,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: closeMobileSidebar,
@@ -244,29 +211,17 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
 
-        // =========================================================
         // MOBILE SIDEBAR
-        // =========================================================
-        //
-        // Sidebar also starts BELOW the header.
-        //
-        // This prevents it from covering the hamburger button.
-        // =========================================================
         AnimatedPositioned(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
-
           left: mobileSidebarOpen ? 0 : -270,
-
           top: mobileHeaderHeight,
-          bottom: 0,
-
+          bottom: 90, // Lifted above mobile browser bottom navigation bars
           width: 270,
-
           child: Material(
             elevation: 16,
             color: const Color(0xFF071A3D),
-
             child: AppSidebar(
               selectedMenu: selectedMenu,
               onMenuSelected: selectMenu,
@@ -284,31 +239,15 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildDesktopLayout() {
     return Column(
       children: [
-        // =========================================================
-        // HEADER
-        // =========================================================
-
         AppHeader(onMenuPressed: toggleSidebar),
-
-        // =========================================================
-        // MAIN AREA
-        // =========================================================
         Expanded(
           child: Row(
             children: [
-              // ---------------------------------------------------
-              // SIDEBAR
-              // ---------------------------------------------------
-
               if (sidebarOpen)
                 AppSidebar(
                   selectedMenu: selectedMenu,
                   onMenuSelected: selectMenu,
                 ),
-
-              // ---------------------------------------------------
-              // DASHBOARD
-              // ---------------------------------------------------
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
@@ -330,10 +269,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // =========================================================
-        // TITLE
-        // =========================================================
-
         const Text(
           'Dashboard',
           style: TextStyle(
@@ -342,47 +277,20 @@ class _DashboardPageState extends State<DashboardPage> {
             color: Color(0xFF172033),
           ),
         ),
-
         const SizedBox(height: 6),
-
         const Text(
           'Welcome to OneCloud Enterprise Platform',
           style: TextStyle(fontSize: 15, color: Color(0xFF64748B)),
         ),
-
         const SizedBox(height: 24),
-
-        // =========================================================
-        // KPI CARDS
-        // =========================================================
         _buildKpiSection(),
-
         const SizedBox(height: 24),
-
-        // =========================================================
-        // SALES + APPROVALS
-        // =========================================================
         _buildSalesAndApprovalsSection(),
-
         const SizedBox(height: 24),
-
-        // =========================================================
-        // QUICK ACCESS
-        // =========================================================
         _buildQuickAccessCard(),
-
         const SizedBox(height: 24),
-
-        // =========================================================
-        // AI RECOMMENDATIONS
-        // =========================================================
         _buildAiRecommendationCard(),
-
         const SizedBox(height: 30),
-
-        // =========================================================
-        // FOOTER
-        // =========================================================
         const AppFooter(),
       ],
     );
@@ -396,7 +304,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double availableWidth = constraints.maxWidth;
-
         int columns;
 
         if (availableWidth >= 1100) {
@@ -408,7 +315,6 @@ class _DashboardPageState extends State<DashboardPage> {
         }
 
         const double spacing = 16;
-
         final double cardWidth = columns == 1
             ? availableWidth
             : (availableWidth - ((columns - 1) * spacing)) / columns;
@@ -424,7 +330,6 @@ class _DashboardPageState extends State<DashboardPage> {
               subtitle: '+8.5% this month',
               icon: Icons.trending_up,
             ),
-
             _buildKpiCard(
               width: cardWidth,
               title: 'Profit',
@@ -432,7 +337,6 @@ class _DashboardPageState extends State<DashboardPage> {
               subtitle: '+6.2% this month',
               icon: Icons.account_balance,
             ),
-
             _buildKpiCard(
               width: cardWidth,
               title: 'Employees',
@@ -440,7 +344,6 @@ class _DashboardPageState extends State<DashboardPage> {
               subtitle: 'Active employees',
               icon: Icons.people_outline,
             ),
-
             _buildKpiCard(
               width: cardWidth,
               title: 'Customers',
@@ -492,9 +395,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               child: Icon(icon, color: const Color(0xFF0B6FF9), size: 26),
             ),
-
             const SizedBox(width: 16),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -506,9 +407,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       color: Color(0xFF64748B),
                     ),
                   ),
-
                   const SizedBox(height: 4),
-
                   Text(
                     value,
                     style: const TextStyle(
@@ -517,9 +416,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       color: Color(0xFF172033),
                     ),
                   ),
-
                   const SizedBox(height: 3),
-
                   Text(
                     subtitle,
                     style: const TextStyle(
@@ -547,9 +444,7 @@ class _DashboardPageState extends State<DashboardPage> {
           return Column(
             children: [
               _buildSalesPipelineCard(),
-
               const SizedBox(height: 20),
-
               _buildPendingApprovalsCard(),
             ],
           );
@@ -559,9 +454,7 @@ class _DashboardPageState extends State<DashboardPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: _buildSalesPipelineCard()),
-
             const SizedBox(width: 20),
-
             Expanded(child: _buildPendingApprovalsCard()),
           ],
         );
@@ -586,21 +479,13 @@ class _DashboardPageState extends State<DashboardPage> {
               color: Color(0xFF172033),
             ),
           ),
-
           const SizedBox(height: 20),
-
           _buildPipelineRow('Leads', '428', 0.85),
-
           const SizedBox(height: 18),
-
           _buildPipelineRow('Opportunities', '186', 0.65),
-
           const SizedBox(height: 18),
-
           _buildPipelineRow('Quotations', '92', 0.45),
-
           const SizedBox(height: 18),
-
           _buildPipelineRow('Closed Deals', '47', 0.30),
         ],
       ),
@@ -622,7 +507,6 @@ class _DashboardPageState extends State<DashboardPage> {
               title,
               style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
             ),
-
             Text(
               value,
               style: const TextStyle(
@@ -633,9 +517,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ],
         ),
-
         const SizedBox(height: 8),
-
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: LinearProgressIndicator(
@@ -666,23 +548,18 @@ class _DashboardPageState extends State<DashboardPage> {
               color: Color(0xFF172033),
             ),
           ),
-
           const SizedBox(height: 15),
-
           _approvalRow(
             Icons.shopping_cart_outlined,
             'Purchase Request',
             '₹2,40,000',
           ),
-
           _approvalRow(Icons.person_outline, 'Leave Request', '3 Employees'),
-
           _approvalRow(
             Icons.account_balance_outlined,
             'Expense Claim',
             '₹18,500',
           ),
-
           _approvalRow(
             Icons.description_outlined,
             'Document Approval',
@@ -714,9 +591,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             child: Icon(icon, color: const Color(0xFF0B6FF9)),
           ),
-
           const SizedBox(width: 14),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -729,9 +604,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     color: Color(0xFF172033),
                   ),
                 ),
-
                 const SizedBox(height: 4),
-
                 Text(
                   subtitle,
                   style: const TextStyle(
@@ -742,7 +615,6 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             ),
           ),
-
           const Icon(Icons.chevron_right, color: Color(0xFF94A3B8)),
         ],
       ),
@@ -777,9 +649,7 @@ class _DashboardPageState extends State<DashboardPage> {
               color: Color(0xFF172033),
             ),
           ),
-
           const SizedBox(height: 16),
-
           Wrap(
             spacing: 10,
             runSpacing: 10,
@@ -824,9 +694,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             child: const Icon(Icons.auto_awesome, color: Color(0xFF0B6FF9)),
           ),
-
           const SizedBox(width: 16),
-
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -839,9 +707,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     color: Color(0xFF172033),
                   ),
                 ),
-
                 SizedBox(height: 6),
-
                 Text(
                   'AI-powered recommendations and insights will appear here as Enterprise AI services are connected.',
                   style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),

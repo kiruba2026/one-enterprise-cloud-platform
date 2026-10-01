@@ -42,12 +42,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // DESKTOP LAYOUT (Matches Login & Signup)
             if (constraints.maxWidth >= 900) {
               return Row(
                 children: [
@@ -57,8 +59,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               );
             }
 
-            // MOBILE LAYOUT
             return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(bottom: 90.0 + bottomInset),
               child: Column(
                 children: [_buildMobileHeader(), _buildMobileRightSection()],
               ),
@@ -69,9 +72,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  // -------------------------------------------------------------
-  // DESKTOP LEFT SECTION (Exact match to Login & Signup)
-  // -------------------------------------------------------------
+  // Left banner uses one_enterprise_left_full.png
   Widget _buildLeftSection() {
     return Container(
       width: double.infinity,
@@ -89,9 +90,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  // -------------------------------------------------------------
-  // MOBILE TOP HEADER (Matches Login & Signup)
-  // -------------------------------------------------------------
   Widget _buildMobileHeader() {
     return Container(
       width: double.infinity,
@@ -118,51 +116,34 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  // -------------------------------------------------------------
-  // DESKTOP RIGHT SECTION
-  // -------------------------------------------------------------
   Widget _buildDesktopRightSection() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 440),
-          child: _buildCard(isMobile: false),
+          child: _buildCard(),
         ),
       ),
     );
   }
 
-  // -------------------------------------------------------------
-  // MOBILE RIGHT SECTION
-  // -------------------------------------------------------------
   Widget _buildMobileRightSection() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 24.0,
-            ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: _buildCard(isMobile: true),
-            ),
-          ),
-        );
-      },
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: _buildCard(),
+        ),
+      ),
     );
   }
 
-  // -------------------------------------------------------------
-  // FORGOT PASSWORD CARD
-  // -------------------------------------------------------------
-  Widget _buildCard({required bool isMobile}) {
+  Widget _buildCard() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // BACK BUTTON
         Align(
           alignment: Alignment.centerLeft,
           child: InkWell(
@@ -199,7 +180,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: Color(0xFF6B7280),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
 
         const Text(
           'Forgot Password?',
@@ -210,13 +191,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
 
         const Text(
           'Enter your work email or username and we will send you a reset link.',
           style: TextStyle(fontSize: 14, height: 1.4, color: Color(0xFF64748B)),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
 
         const Text(
           'Work email or Username',
@@ -226,10 +207,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: Color(0xFF0F172A),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
 
         SizedBox(
-          height: 48,
+          height: 46,
           child: TextField(
             controller: _usernameController,
             keyboardType: TextInputType.emailAddress,
@@ -255,10 +236,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 22),
 
         SizedBox(
-          height: 48,
+          height: 46,
           child: ElevatedButton(
             onPressed: _sendResetLink,
             style: ElevatedButton.styleFrom(
@@ -275,7 +256,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
         Center(
           child: GestureDetector(

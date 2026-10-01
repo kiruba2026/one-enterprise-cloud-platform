@@ -19,10 +19,6 @@ class AppSidebar extends StatefulWidget {
 }
 
 class _AppSidebarState extends State<AppSidebar> {
-  // ================================================================
-  // EXPANDED MENU STATE
-  // ================================================================
-
   final Map<String, bool> expandedMenus = {
     'Platform Administration': false,
     'HRMS': false,
@@ -42,10 +38,6 @@ class _AppSidebarState extends State<AppSidebar> {
     'Security & Compliance': false,
   };
 
-  // ================================================================
-  // BUILD
-  // ================================================================
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -54,17 +46,12 @@ class _AppSidebarState extends State<AppSidebar> {
       child: Column(
         children: [
           // ==========================================================
-          // SIDEBAR MENU
+          // SCROLLABLE MENU LIST
           // ==========================================================
-
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               children: [
-                // ====================================================
-                // MAIN MENU
-                // ====================================================
-
                 _sectionTitle('MAIN MENU'),
 
                 _mainMenuItem(
@@ -75,9 +62,6 @@ class _AppSidebarState extends State<AppSidebar> {
 
                 const SizedBox(height: 12),
 
-                // ====================================================
-                // PLATFORM
-                // ====================================================
                 _sectionTitle('PLATFORM'),
 
                 _expandableMenu(
@@ -96,14 +80,8 @@ class _AppSidebarState extends State<AppSidebar> {
 
                 const SizedBox(height: 12),
 
-                // ====================================================
-                // BUSINESS MODULES
-                // ====================================================
                 _sectionTitle('BUSINESS MODULES'),
 
-                // ====================================================
-                // HRMS
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.people_outline,
                   title: 'HRMS',
@@ -120,9 +98,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // CRM
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.handshake_outlined,
                   title: 'CRM',
@@ -139,9 +114,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // ERP
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.business_center_outlined,
                   title: 'ERP',
@@ -157,9 +129,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // FINANCE & ACCOUNTING
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.account_balance_outlined,
                   title: 'Finance & Accounting',
@@ -179,9 +148,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // WORKFLOW & AUTOMATION
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.account_tree_outlined,
                   title: 'Workflow & Automation',
@@ -198,9 +164,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // DOCUMENT MANAGEMENT
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.folder_outlined,
                   title: 'Document Management',
@@ -223,9 +186,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // SUBSCRIPTION
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.card_membership_outlined,
                   title: 'Subscription',
@@ -248,9 +208,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // REVENUE
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.monetization_on_outlined,
                   title: 'Revenue',
@@ -278,14 +235,8 @@ class _AppSidebarState extends State<AppSidebar> {
 
                 const SizedBox(height: 12),
 
-                // ====================================================
-                // SERVICES
-                // ====================================================
                 _sectionTitle('SERVICES'),
 
-                // ====================================================
-                // REPORTING & BI
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.analytics_outlined,
                   title: 'Reporting & BI',
@@ -304,9 +255,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // ENTERPRISE AI
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.auto_awesome_outlined,
                   title: 'Enterprise AI',
@@ -326,9 +274,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // NOTIFICATION
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.notifications_outlined,
                   title: 'Notification',
@@ -351,9 +296,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // CALENDAR
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.calendar_month_outlined,
                   title: 'Calendar',
@@ -376,9 +318,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // INTEGRATION
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.integration_instructions_outlined,
                   title: 'Integration',
@@ -403,9 +342,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // SEARCH
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.search_outlined,
                   title: 'Search',
@@ -422,9 +358,6 @@ class _AppSidebarState extends State<AppSidebar> {
                   ],
                 ),
 
-                // ====================================================
-                // SECURITY & COMPLIANCE
-                // ====================================================
                 _expandableMenu(
                   icon: Icons.security_outlined,
                   title: 'Security & Compliance',
@@ -449,9 +382,6 @@ class _AppSidebarState extends State<AppSidebar> {
 
                 const SizedBox(height: 12),
 
-                // ====================================================
-                // SYSTEM
-                // ====================================================
                 _sectionTitle('SYSTEM'),
 
                 _mainMenuItem(
@@ -460,38 +390,38 @@ class _AppSidebarState extends State<AppSidebar> {
                   route: AppRoutes.settings,
                 ),
 
-                const SizedBox(height: 15),
+                const SizedBox(height: 12),
               ],
             ),
           ),
 
           // ==========================================================
-          // USER SECTION
+          // USER PROFILE & LOGOUT FOOTER (PINNED AT BOTTOM)
           // ==========================================================
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: const BoxDecoration(
+              color: Color(0xFF071A3D),
               border: Border(top: BorderSide(color: Color(0xFF20345A))),
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
                     const CircleAvatar(
-                      radius: 18,
+                      radius: 16,
                       backgroundColor: Color(0xFFE8F1FF),
                       child: Text(
                         'KR',
                         style: TextStyle(
                           color: Color(0xFF1877F2),
-                          fontSize: 12,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-
-                    const SizedBox(width: 10),
-
+                    const SizedBox(width: 8),
                     const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,13 +431,14 @@ class _AppSidebarState extends State<AppSidebar> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
+                              fontSize: 12,
                             ),
                           ),
                           Text(
                             'Administrator',
                             style: TextStyle(
                               color: Color(0xFF9EB4D8),
-                              fontSize: 11,
+                              fontSize: 10,
                             ),
                           ),
                         ],
@@ -515,30 +446,26 @@ class _AppSidebarState extends State<AppSidebar> {
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 8),
-
-                // ====================================================
-                // LOGOUT
-                // ====================================================
+                const SizedBox(height: 6),
                 SizedBox(
                   width: double.infinity,
+                  height: 32,
                   child: TextButton.icon(
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, AppRoutes.login);
                     },
-                    icon: const Icon(Icons.logout_outlined, size: 19),
-                    label: const Text('Logout'),
+                    icon: const Icon(Icons.logout_outlined, size: 16),
+                    label: const Text(
+                      'Logout',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     style: TextButton.styleFrom(
                       foregroundColor: const Color(0xFFFF5A5F),
                       alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                     ),
                   ),
                 ),
@@ -549,10 +476,6 @@ class _AppSidebarState extends State<AppSidebar> {
       ),
     );
   }
-
-  // ================================================================
-  // SECTION TITLE
-  // ================================================================
 
   Widget _sectionTitle(String title) {
     return Padding(
@@ -568,10 +491,6 @@ class _AppSidebarState extends State<AppSidebar> {
       ),
     );
   }
-
-  // ================================================================
-  // NORMAL MENU ITEM
-  // ================================================================
 
   Widget _mainMenuItem({
     required IconData icon,
@@ -603,7 +522,6 @@ class _AppSidebarState extends State<AppSidebar> {
           ),
           onTap: () {
             widget.onMenuSelected(title);
-
             if (ModalRoute.of(context)?.settings.name != route) {
               Navigator.pushNamed(context, route);
             }
@@ -613,25 +531,16 @@ class _AppSidebarState extends State<AppSidebar> {
     );
   }
 
-  // ================================================================
-  // EXPANDABLE MENU
-  // ================================================================
-
   Widget _expandableMenu({
     required IconData icon,
     required String title,
     required List<_SubMenu> children,
   }) {
     final bool expanded = expandedMenus[title] ?? false;
-
     final bool selected = widget.selectedMenu == title;
 
     return Column(
       children: [
-        // ============================================================
-        // PARENT MENU
-        // ============================================================
-
         Container(
           margin: const EdgeInsets.only(bottom: 2),
           child: Material(
@@ -666,16 +575,10 @@ class _AppSidebarState extends State<AppSidebar> {
                 setState(() {
                   expandedMenus[title] = !expanded;
                 });
-
-                widget.onMenuSelected(title);
               },
             ),
           ),
         ),
-
-        // ============================================================
-        // SUBMENU
-        // ============================================================
         ClipRect(
           child: AnimatedSize(
             duration: const Duration(milliseconds: 250),
@@ -696,10 +599,6 @@ class _AppSidebarState extends State<AppSidebar> {
     );
   }
 
-  // ================================================================
-  // SUBMENU ITEM
-  // ================================================================
-
   Widget _submenuItem(_SubMenu item) {
     final bool selected = widget.selectedMenu == item.title;
 
@@ -709,10 +608,7 @@ class _AppSidebarState extends State<AppSidebar> {
       child: InkWell(
         borderRadius: BorderRadius.circular(6),
         onTap: () {
-          // Update selected menu.
           widget.onMenuSelected(item.title);
-
-          // Navigate to the submenu route.
           Navigator.pushNamed(context, item.route);
         },
         child: Container(
@@ -725,18 +621,12 @@ class _AppSidebarState extends State<AppSidebar> {
           ),
           child: Row(
             children: [
-              // ======================================================
-              // SUBMENU ICON
-              // ======================================================
-
               Icon(
                 _getSubmenuIcon(item.title),
                 size: 16,
                 color: selected ? Colors.white : const Color(0xFF9EB4D8),
               ),
-
               const SizedBox(width: 10),
-
               Expanded(
                 child: Text(
                   item.title,
@@ -754,13 +644,8 @@ class _AppSidebarState extends State<AppSidebar> {
     );
   }
 
-  // ================================================================
-  // SUBMENU ICONS
-  // ================================================================
-
   IconData _getSubmenuIcon(String title) {
     switch (title) {
-      // PLATFORM
       case 'Global Settings':
         return Icons.settings_outlined;
       case 'Platform Config':
@@ -775,8 +660,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.health_and_safety_outlined;
       case 'Tenant Templates':
         return Icons.business_outlined;
-
-      // HRMS
       case 'Employee Mgmt.':
         return Icons.badge_outlined;
       case 'Attendance':
@@ -795,8 +678,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.manage_accounts_outlined;
       case 'Asset Mgmt.':
         return Icons.inventory_2_outlined;
-
-      // CRM
       case 'Leads':
         return Icons.person_add_alt_outlined;
       case 'Opportunities':
@@ -815,8 +696,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.campaign_outlined;
       case 'Customer Support':
         return Icons.support_agent_outlined;
-
-      // ERP
       case 'Inventory':
         return Icons.inventory_outlined;
       case 'Procurement':
@@ -831,8 +710,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.build_outlined;
       case 'Vendors':
         return Icons.storefront_outlined;
-
-      // FINANCE
       case 'General Ledger':
         return Icons.menu_book_outlined;
       case 'Accounts Payable':
@@ -851,8 +728,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.sync_alt_outlined;
       case 'Multi-Currency':
         return Icons.currency_exchange_outlined;
-
-      // WORKFLOW
       case 'Workflow Builder':
         return Icons.account_tree_outlined;
       case 'Approvals':
@@ -871,8 +746,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.monitor_heart_outlined;
       case 'Workflow Templates':
         return Icons.description_outlined;
-
-      // DOCUMENT
       case 'Document Repository':
         return Icons.folder_copy_outlined;
       case 'Versioning':
@@ -891,8 +764,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.fact_check_outlined;
       case 'OCR Integration':
         return Icons.document_scanner_outlined;
-
-      // SUBSCRIPTION
       case 'Plans & Features':
         return Icons.view_module_outlined;
       case 'Tenant Subscriptions':
@@ -911,8 +782,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.hourglass_empty_outlined;
       case 'Billing Integration':
         return Icons.receipt_long_outlined;
-
-      // REVENUE
       case 'Revenue Tracking':
         return Icons.trending_up_outlined;
       case 'Usage Analytics':
@@ -931,8 +800,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.receipt_long_outlined;
       case 'Integration':
         return Icons.integration_instructions_outlined;
-
-      // REPORTING
       case 'Standard Reports':
         return Icons.description_outlined;
       case 'Ad-hoc Reports':
@@ -949,8 +816,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.pie_chart_outline;
       case 'Self-Service Analytics':
         return Icons.auto_graph_outlined;
-
-      // AI
       case 'AI Models':
         return Icons.model_training_outlined;
       case 'AI Chat / Copilot':
@@ -969,8 +834,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.psychology_outlined;
       case 'AI Usage Logs':
         return Icons.history_outlined;
-
-      // NOTIFICATION
       case 'In-App Notifications':
         return Icons.notifications_active_outlined;
       case 'Email Notifications':
@@ -989,8 +852,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.local_shipping_outlined;
       case 'Multi-Channel':
         return Icons.hub_outlined;
-
-      // CALENDAR
       case 'User Calendars':
         return Icons.calendar_today_outlined;
       case 'Team Calendars':
@@ -1009,8 +870,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.notifications_outlined;
       case 'Shared Calendars':
         return Icons.calendar_view_month_outlined;
-
-      // INTEGRATION
       case 'API Management':
         return Icons.api_outlined;
       case 'Third-Party Integrations':
@@ -1027,8 +886,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.link_outlined;
       case 'Integration Logs':
         return Icons.article_outlined;
-
-      // SEARCH
       case 'Global Search':
         return Icons.search_outlined;
       case 'Index Management':
@@ -1047,8 +904,6 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.compare_arrows_outlined;
       case 'Suggestion Engine':
         return Icons.lightbulb_outline;
-
-      // SECURITY
       case 'Audit Logs':
         return Icons.receipt_long_outlined;
       case 'Activity Tracking':
@@ -1067,16 +922,11 @@ class _AppSidebarState extends State<AppSidebar> {
         return Icons.key_outlined;
       case 'Security Alerts':
         return Icons.security_outlined;
-
       default:
         return Icons.chevron_right_outlined;
     }
   }
 }
-
-// ====================================================================
-// SUBMENU MODEL
-// ====================================================================
 
 class _SubMenu {
   final String title;

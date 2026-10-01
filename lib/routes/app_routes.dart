@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../pages/landing_page.dart';
 import '../pages/login_signup/login_page.dart';
 import '../pages/login_signup/signup_page.dart';
 import '../pages/login_signup/forgot_password_page.dart';
@@ -10,9 +11,10 @@ import '../pages/platform_administration/global_settings_page.dart';
 
 class AppRoutes {
   // ================================================================
-  // AUTHENTICATION
+  // LANDING & AUTHENTICATION
   // ================================================================
 
+  static const String landing = '/';
   static const String login = '/login';
   static const String signup = '/signup';
   static const String forgotPassword = '/forgot-password';
@@ -355,6 +357,7 @@ class AppRoutes {
 
   static const String activityTracking = '/security/activity-tracking';
 
+  static const warmString = '/security/compliance-reports';
   static const String complianceReports = '/security/compliance-reports';
 
   static const String dataRetention = '/security/data-retention';
@@ -384,8 +387,9 @@ class AppRoutes {
   static Map<String, WidgetBuilder> get routes {
     return {
       // ------------------------------------------------------------
-      // AUTH
+      // LANDING & AUTH
       // ------------------------------------------------------------
+      landing: (context) => const LandingPage(),
 
       login: (context) => const LoginPage(),
 
@@ -1086,11 +1090,6 @@ class AppRoutes {
 // ====================================================================
 // PLACEHOLDER PAGE
 // ====================================================================
-//
-// These pages are temporary.
-// Later we can replace each one with the actual Figma UI.
-//
-// ====================================================================
 
 class ModulePlaceholderPage extends StatelessWidget {
   final String title;
@@ -1106,13 +1105,11 @@ class ModulePlaceholderPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
-
       appBar: AppBar(
         title: Text(title),
         backgroundColor: const Color(0xFF071A3D),
         foregroundColor: Colors.white,
       ),
-
       body: Center(
         child: Container(
           width: 500,
@@ -1137,9 +1134,7 @@ class ModulePlaceholderPage extends StatelessWidget {
                 size: 60,
                 color: Color(0xFF0B6FF9),
               ),
-
               const SizedBox(height: 20),
-
               Text(
                 title,
                 textAlign: TextAlign.center,
@@ -1149,9 +1144,7 @@ class ModulePlaceholderPage extends StatelessWidget {
                   color: Color(0xFF071A3D),
                 ),
               ),
-
               const SizedBox(height: 10),
-
               Text(
                 module,
                 textAlign: TextAlign.center,
@@ -1161,17 +1154,13 @@ class ModulePlaceholderPage extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-
               const SizedBox(height: 20),
-
               const Text(
                 'This page is ready for the actual OneCloud module UI.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
-
               const SizedBox(height: 25),
-
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
