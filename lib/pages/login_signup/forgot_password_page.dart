@@ -43,7 +43,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F8FC),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -58,7 +58,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             }
 
             // MOBILE LAYOUT
-            return _buildMobileLayout();
+            return SingleChildScrollView(
+              child: Column(
+                children: [_buildMobileHeader(), _buildMobileRightSection()],
+              ),
+            );
           },
         ),
       ),
@@ -66,7 +70,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   // -------------------------------------------------------------
-  // DESKTOP LEFT SECTION (Exact match to Login)
+  // DESKTOP LEFT SECTION (Exact match to Login & Signup)
   // -------------------------------------------------------------
   Widget _buildLeftSection() {
     return Container(
@@ -86,21 +90,27 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   // -------------------------------------------------------------
-  // DESKTOP RIGHT SECTION
+  // MOBILE TOP HEADER (Matches Login & Signup)
   // -------------------------------------------------------------
-  Widget _buildDesktopRightSection() {
+  Widget _buildMobileHeader() {
     return Container(
       width: double.infinity,
-      height: double.infinity,
-      color: const Color(0xFFFAFBFD),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 35),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 600),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: _buildCard(isMobile: false),
+      color: Colors.black,
+      alignment: Alignment.center,
+      child: Image.asset(
+        'assets/images/Mobile_login_top.png',
+        width: double.infinity,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (context, error, stackTrace) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          alignment: Alignment.center,
+          child: const Text(
+            'One Enterprise',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -109,79 +119,39 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   // -------------------------------------------------------------
-  // MOBILE LAYOUT
+  // DESKTOP RIGHT SECTION
   // -------------------------------------------------------------
-  Widget _buildMobileLayout() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final horizontalPadding = width < 380 ? 16.0 : 22.0;
-
-        return SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: 24,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildMobileBrand(),
-              const SizedBox(height: 24),
-              _buildCard(isMobile: true),
-              const SizedBox(height: 20),
-              _buildMobileFooter(),
-            ],
-          ),
-        );
-      },
+  Widget _buildDesktopRightSection() {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: _buildCard(isMobile: false),
+        ),
+      ),
     );
   }
 
-  Widget _buildMobileBrand() {
-    return Center(
-      child: Column(
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1877F2),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF1877F2).withValues(alpha: 0.20),
-                  blurRadius: 18,
-                  offset: const Offset(0, 7),
-                ),
-              ],
+  // -------------------------------------------------------------
+  // MOBILE RIGHT SECTION
+  // -------------------------------------------------------------
+  Widget _buildMobileRightSection() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 24.0,
             ),
-            child: const Icon(
-              Icons.cloud_outlined,
-              color: Colors.white,
-              size: 34,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: _buildCard(isMobile: true),
             ),
           ),
-          const SizedBox(height: 10),
-          const Text(
-            'OneCloud',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1877F2),
-            ),
-          ),
-          const SizedBox(height: 2),
-          const Text(
-            'Enterprise Platform',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF667085),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -189,174 +159,145 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   // FORGOT PASSWORD CARD
   // -------------------------------------------------------------
   Widget _buildCard({required bool isMobile}) {
-    final padding = isMobile ? 22.0 : 40.0;
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        padding,
-        isMobile ? 24 : 36,
-        padding,
-        isMobile ? 24 : 38,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(isMobile ? 18 : 20),
-        border: Border.all(color: const Color(0xFFE6EBF2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 25,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // BACK BUTTON
-          Align(
-            alignment: Alignment.centerLeft,
-            child: InkWell(
-              onTap: _backToLogin,
-              borderRadius: BorderRadius.circular(20),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-                child: Icon(
-                  Icons.arrow_back,
-                  size: 22,
-                  color: Color(0xFF344054),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // BACK BUTTON
+        Align(
+          alignment: Alignment.centerLeft,
+          child: InkWell(
+            onTap: _backToLogin,
+            borderRadius: BorderRadius.circular(4),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.chevron_left, size: 20, color: Color(0xFF64748B)),
+                  SizedBox(width: 4),
+                  Text(
+                    'Back',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 16),
+        ),
+        const SizedBox(height: 24),
 
-          // TITLE (Matched with Login Welcome)
-          const Text(
-            'Forgot Password?',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF16233B),
-            ),
+        const Text(
+          'ACCOUNT RECOVERY',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.8,
+            color: Color(0xFF6B7280),
           ),
-          const SizedBox(height: 8),
+        ),
+        const SizedBox(height: 10),
 
-          // SUBTITLE
-          const Text(
-            'Enter your username or email address and we will send you a reset link.',
-            style: TextStyle(
-              fontSize: 14,
-              height: 1.5,
-              color: Color(0xFF667085),
-            ),
+        const Text(
+          'Forgot Password?',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF0F172A),
+            letterSpacing: -0.5,
           ),
-          const SizedBox(height: 28),
+        ),
+        const SizedBox(height: 8),
 
-          // USERNAME OR EMAIL LABEL
-          const Text(
-            'Username or Email',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF344054),
-            ),
+        const Text(
+          'Enter your work email or username and we will send you a reset link.',
+          style: TextStyle(fontSize: 14, height: 1.4, color: Color(0xFF64748B)),
+        ),
+        const SizedBox(height: 28),
+
+        const Text(
+          'Work email or Username',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF0F172A),
           ),
-          const SizedBox(height: 8),
+        ),
+        const SizedBox(height: 8),
 
-          // INPUT FIELD (Same decoration as Login)
-          TextField(
+        SizedBox(
+          height: 48,
+          child: TextField(
             controller: _usernameController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.done,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
             decoration: InputDecoration(
-              hintText: 'Enter username or email',
-              hintStyle: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF98A2B3),
-              ),
-              prefixIcon: const Icon(
-                Icons.person_outline,
-                size: 21,
-                color: Color(0xFF667085),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 16,
-              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28),
-                borderSide: const BorderSide(color: Color(0xFFE1E6ED)),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28),
-                borderSide: const BorderSide(color: Color(0xFFE1E6ED)),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(
-                  color: Color(0xFF1877F2),
+                  color: Color(0xFF0F172A),
                   width: 1.5,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+        ),
+        const SizedBox(height: 24),
 
-          // SUBMIT BUTTON (Same size/color as Login primary button)
-          SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _sendResetLink,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1877F2),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(26),
-                ),
+        SizedBox(
+          height: 48,
+          child: ElevatedButton(
+            onPressed: _sendResetLink,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0F172A),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                'Send Reset Link',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
+            child: const Text(
+              'Send Reset Link',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        Center(
+          child: GestureDetector(
+            onTap: _backToLogin,
+            child: RichText(
+              text: const TextSpan(
+                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                children: [
+                  TextSpan(text: 'Remember your password? '),
+                  TextSpan(
+                    text: 'Sign in',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF2563EB),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 22),
-
-          // RETURN TO LOGIN LINK
-          Center(
-            child: TextButton(
-              onPressed: _backToLogin,
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: const Text(
-                'Back to Login',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1877F2),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMobileFooter() {
-    return const Center(
-      child: Text(
-        '© OneCloud Enterprise Platform',
-        style: TextStyle(fontSize: 11, color: Color(0xFF98A2B3)),
-      ),
+        ),
+      ],
     );
   }
 }
